@@ -1,0 +1,16 @@
+{
+  "name": "ClavusOS — Gestão do seu studio",
+  "short_name": "ClavusOS",
+  "description": "Agenda, clientes, caixa e assinaturas do seu studio de unhas num app só.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFF7FB",
+  "theme_color": "#E91E8C",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
