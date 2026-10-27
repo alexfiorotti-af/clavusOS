@@ -1,0 +1,23 @@
+{
+  "name": "clavusos-app",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.6" },
+  "scripts": {
+    "start": "node --experimental-strip-types src/servidor.ts",
+    "migrar": "node --experimental-strip-types src/ferramentas/migrar.ts",
+    "criar-studio": "node --experimental-strip-types src/ferramentas/criar-studio.ts",
+    "studios": "node --experimental-strip-types src/ferramentas/studios.ts",
+    "studio-modelo": "node --experimental-strip-types src/ferramentas/studio-modelo.ts",
+    "tipos": "tsc --noEmit",
+    "teste": "npm run teste:puros && npm run teste:banco",
+    "teste:puros": "node --experimental-strip-types --test src/dados/dinheiro.teste.ts src/dados/datas.teste.ts src/auth/senha.teste.ts src/http/cookie.teste.ts src/http/formulario.teste.ts src/agenda/horarios.teste.ts src/cobrancas/asaas.teste.ts src/studio/resolver.teste.ts src/assinatura/assinatura.teste.ts",
+    "teste:banco": "node --experimental-strip-types --test src/db/banco.teste.ts"
+  },
+  "dependencies": { "pg": "^8.13.1" },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/pg": "^8.11.10",
+    "typescript": "^5.7.2"
+  }
+}

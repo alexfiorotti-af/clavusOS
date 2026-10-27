@@ -1,0 +1,3 @@
+import { test } from "node:test"; import assert from "node:assert/strict";
+import { slugDoHost } from "./resolver.ts";
+test("slug pelo host", () => { assert.equal(slugDoHost("studiosol.clavusos.com.br", "clavusos.com.br"), "studiosol"); assert.equal(slugDoHost("studiosol.clavusos.com.br:3000", "clavusos.com.br"), "studiosol"); assert.equal(slugDoHost("clavusos.com.br", "clavusos.com.br"), null); assert.equal(slugDoHost("www.clavusos.com.br", "clavusos.com.br"), null); assert.equal(slugDoHost("a.b.clavusos.com.br", "clavusos.com.br"), null); assert.equal(slugDoHost("localhost:3000", "clavusos.com.br"), null); assert.equal(slugDoHost("evil.com", "clavusos.com.br"), null); assert.equal(slugDoHost(undefined, "clavusos.com.br"), null); });

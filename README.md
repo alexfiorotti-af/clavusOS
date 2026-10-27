@@ -1,53 +1,66 @@
 # ClavusOS 💅
 
-**Gestão completa do studio de unhas num app só** — agenda, mapa por profissional, clientes com alerta de "unha vencida", caixa com fluxo financeiro, PDV de produtos, relatórios, equipe e planos de assinatura.
+**Gestão completa do studio de unhas, white-label** — um sistema, vários studios: agenda com mapa
+por profissional e trava de choque no banco, clientes com alerta de **unha vencida** e origem do
+lead, caixa com fluxo financeiro e PDV, relatórios com comissão por profissional, planos de
+assinatura, página pública em que a cliente agenda sozinha, e cobrança pelo **Asaas** em dois
+níveis — a AF cobra a mensalidade do studio; o studio cobra as clientes na própria conta.
 
-Produto white-label da **AF Tecnologia e Marketing** — segundo nicho do construtor de SaaS (o primeiro é o CoachOS). *Clavus* é "unha/prego" em latim.
+> Produto da **AF Tecnologia e Marketing Ltda.**, autoria de Alex Fiorotti. Segundo nicho do
+> construtor de SaaS (o primeiro é o CoachOS); engenharia no padrão Pousa. *Clavus* = unha, em latim.
 
-## O que o app faz (Fase 1 — protótipo PWA)
+## O código
 
-| Módulo | O que entrega |
+| Pasta | O que é |
 |---|---|
-| **Agenda** | Hoje · Amanhã · Semana · Mês + **Mapa** (colunas por profissional × horário); conflito de horário com "salvar mesmo assim" (encaixe); confirmação por WhatsApp |
-| **Clientes (CRM)** | Origem do lead (Instagram, indicação, Google…), lead → cliente automático no 1º atendimento, histórico, aniversário |
-| **Unha vencida** 🔔 | Cada serviço tem um ciclo (gel 21d, fibra 28d…). O app calcula pela última unha concluída e alerta no painel quantas clientes estão vencidas — com botão de WhatsApp pronto para campanha de retorno |
-| **Caixa** | Atendimento concluído vira receita automaticamente; lançamentos manuais de receitas e despesas; **PDV** de venda de produtos com baixa de estoque |
-| **Relatórios** | Fluxo de caixa do mês, receitas por origem, despesas por categoria, **produção e comissão por profissional**, serviços mais vendidos |
-| **Equipe** | Profissionais com cor no mapa e % de comissão |
-| **Planos & assinaturas** | Planos mensal/trimestral/semestral/anual; a cliente escolhe os dias do mês; 1ª cobrança e renovações entram no caixa; geração dos horários do mês em um toque |
-| **Agendamento online** | Prévia do fluxo em que a cliente escolhe serviço → dia → horário livre → confirma (vira link público na Fase 2) |
-| **PWA** | Instalável no celular ("Adicionar à tela inicial"), funciona offline, backup por export/import JSON |
+| `app/` | o web app — Node 22, TypeScript direto, `node:http`, `pg`. Única dependência: o driver do Postgres |
+| `db/` | `001_schema.sql` (tabelas, trava de choque, view de vencidas) · `002_rls.sql` (isolamento entre studios e papéis) |
+| `docs/` | `OPERACAO.md` (ficha de bancada + checklist de deploy) · `DECISOES.md` · `00-AUDITORIA-FASE1.md` |
+| `prototipo/` | a Fase 1 (PWA offline) — **demo comercial**, não é o produto (ver a auditoria) |
+| `CLAUDE.md` | instruções para qualquer CLI de IA que abrir o repositório |
 
-## Como rodar
+**Rodar local:** Postgres rodando → `cd app && cp .env.exemplo .env` (ajustar) → `npm install` →
+`npm run migrar` → `npm run studio-modelo` → `npm start` → `http://localhost:3000` com
+`demo@clavusos.com.br` / `demonstracao` (admin) e `equipe@clavusos.com.br` (profissional).
 
-É um app estático — **zero build, zero backend**:
+**Testar:** `npm run tipos && npm run teste` (35 testes: 27 puros + 8 contra o banco, inclusive
+isolamento RLS, papéis, trava de choque, concluir→caixa, PDV e os webhooks dos dois níveis).
 
-1. **Local:** abra `index.html` no navegador (o service worker só ativa via HTTP/HTTPS).
-2. **Hostinger (ou qualquer hospedagem):** suba a pasta inteira (`index.html`, `sw.js`, `manifest.webmanifest`, `icons/`) para um domínio/subdomínio com HTTPS. Pronto: instalável como app.
+## O que já funciona
 
-Os dados vivem no `localStorage` do navegador da profissional (chaves `clavus.*`). Primeiro uso abre o cadastro de 30 segundos e semeia dados de exemplo (removíveis em **Mais → Ajustes → Limpar dados de exemplo**).
+Login com freio a força bruta, convite por link e esqueci-a-senha · painel do dia com alerta de
+vencidas e aniversariantes · agenda por dia, semana e **mapa por profissional** · novo horário com
+grade de livres, conflito recusado pelo banco e **encaixe** deliberado (gerência) · confirmação e
+lembrete por e-mail e WhatsApp com mensagem pronta · concluir → **receita no caixa** (idempotente)
+· cobrança pelo Asaas do studio (Pix com QR, link) com **baixa só depois de conferir na API** e
+sinal pago confirmando o horário sozinho · clientes com origem do lead, lead→ativa automático,
+aniversários e **unha vencida** calculada no banco, com campanha de retorno pronta · caixa com
+receitas/despesas manuais, anulação auditada e **PDV com baixa de estoque** · relatórios do mês
+(categorias, produção e **comissão por profissional**, top serviços, clientes novas por origem) ·
+**planos e assinaturas** das clientes com dias do mês escolhidos por ela, cobrança automática no
+ciclo nativo do Asaas ou recebimento manual, e geração dos horários do mês · página pública
+`/agendar` com sinal por Pix na hora · configurações completas (studio, serviços com ciclo de
+vencimento, produtos, profissionais, equipe com papéis, Asaas cifrado) · **cobrança do ClavusOS**
+(teste 7 dias → carência → bloqueio sem apagar nada; assinatura mensal ou avulso 1/3/6/12 no Asaas
+da AF) · auditoria · exportação dos dados do studio em JSON · vitrine do produto na raiz ·
+studio de demonstração.
 
-## White-label
+## Segurança (o resumo do que o banco garante)
 
-- Marca: constante `APP_NAME` + nome do negócio em Ajustes.
-- Cores: tokens CSS em `:root` (design system do repositório [`agenda-beleza-skill`](https://github.com/alexfiorotti-af/agenda-beleza-skill)).
-- Idioma: todas as strings no objeto `t` no topo do script.
+- **RLS forçado**: um studio nunca enxerga o outro — nem com bug na aplicação.
+- **Papéis no banco**: profissional não lê o caixa; só gerência anula; só a administradora configura.
+- **Senhas scrypt**, sessões com hash no banco (12 h deslizantes), freio a força bruta.
+- **Chave do Asaas do studio cifrada** (AES-256-GCM) com chave-mestra fora do banco.
+- **Dinheiro em centavos**, trilha de **auditoria**, lançamento nunca apagado (anulado com motivo).
+- Cabeçalhos de segurança + CSP em toda página; cartão nunca passa pelo sistema.
 
-## Roteiro
+## Publicar
 
-- **Fase 1 (este repo):** PWA offline, dados no navegador — validação do produto.
-- **Fase 2:** backend na VPS (Postgres com RLS por tenant, Argon2id, segredos criptografados em repouso, TLS, auditoria). Destrava o **link público de agendamento** e as **assinaturas com portal da cliente**. O export JSON da Fase 1 é o formato do importador.
-- **Fase 3:** multi-tenant white-label com branding e cobrança por studio.
-
-Detalhes em [`docs/arquitetura.md`](docs/arquitetura.md).
-
-## Desenvolvimento
-
-- Stack: HTML + CSS + JS vanilla, arquivo único (`index.html`), mobile-first 360–430px.
-- Padrões herdados do blueprint do construtor: estado versionado com `ensureSchema()` (migração aditiva, nunca destrutiva), export/import JSON, ponto de recuperação antes de importar.
-- Testes: `node --check` + smoke test em jsdom cobrindo os fluxos principais (47 asserções).
+O passo a passo (Supabase SP + hospedagem Node + domínio com curinga + Resend + Asaas + rotina)
+está em **`docs/OPERACAO.md` §8**.
 
 ---
 
-© AF Tecnologia e Marketing · alexfiorotti@gmail.com · WhatsApp (27) 99601-5367
-Uso comercial sob licença — produto para revenda white-label.
+© AF Tecnologia e Marketing Ltda. · alexfiorotti@gmail.com · WhatsApp (27) 99601-5367
+Não é software livre: uso por studios se dá por licença de assinatura, que não transfere o
+código-fonte. Os dados de cada studio pertencem ao studio e podem ser exportados a qualquer momento.

@@ -1,4 +1,7 @@
 node_modules/
 *.log
+.env
+.env.*
+!.env.exemplo
 .DS_Store
 Thumbs.db
