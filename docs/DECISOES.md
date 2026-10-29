@@ -66,3 +66,9 @@
   marca é código, como manda a casa (D018 do Pousa).
 - **D015 · 29/10/2026** — Hostinger: Diretório raiz `app` + Arquivo de entrada `entrada.mjs`
   (importa o servidor no mesmo processo; Node 22.18+ faz o type stripping por padrão).
+- **D016 · 29/10/2026** — **Preço de lançamento: R$ 49,90/mês**, tudo incluso, 7 dias de teste.
+  Decisão do Alex após pesquisa de mercado: é o valor-base dos apps do nicho nail no Brasil.
+  Substitui os R$ 147 da D011 (que fica como histórico/teto para revisão futura, quando houver
+  base de pagantes). O valor vive em `CLAVUS_PRECO_MENSAL` — é o que a vitrine mostra E o que a
+  assinatura cobra no Asaas da AF; mudar preço = mudar a variável e reiniciar o app (studios já
+  assinados mantêm o valor da assinatura criada no Asaas).
