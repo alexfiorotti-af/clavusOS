@@ -24,9 +24,9 @@ export async function recriarDemo(o: OpcoesDemo): Promise<ResultadoDemo> {
   const mm = hoje.slice(5, 7);
   await semStudio((db) => db.query("DELETE FROM studios WHERE slug = $1", [o.slug]));
   const id = await semStudio(async (db) => (await db.query<{ id: string }>(
-    `INSERT INTO studios (slug, nome, cidade, uf, telefone, email, plano, situacao, ciclo_dias, agendar_texto)
-     VALUES ($1,'Studio Lume','Vitória','ES','5500990000000',$2,'cortesia','ativo',25,
-             'Studio de demonstração do ClavusOS — marque à vontade, tudo aqui é fictício 💅') RETURNING id`,
+    `INSERT INTO studios (slug, nome, cidade, uf, telefone, email, plano, situacao, ciclo_dias, cor, agendar_texto)
+     VALUES ($1,'Studio Lume','Vitória','ES','5500990000000',$2,'cortesia','ativo',25,'#A8174A',
+             'Studio de demonstração do ClavusOS — marque à vontade, tudo aqui é fictício.') RETURNING id`,
     [o.slug, `demo@${o.dominioBase}`])).rows[0].id);
 
   return comStudio({ studioId: id, papel: "sistema", fuso: "America/Sao_Paulo" }, async (db) => {
@@ -40,7 +40,7 @@ export async function recriarDemo(o: OpcoesDemo): Promise<ResultadoDemo> {
 
     const prof = (await db.query<{ id: string }>(
       `INSERT INTO profissionais (studio_id, nome, cor, comissao_pct) VALUES
-       ($1,'Lia Martins','#E91E8C',40), ($1,'Bia Ferreira','#9C27B0',45) RETURNING id`, [id])).rows.map((x) => x.id);
+       ($1,'Lia Martins','#D2477A',40), ($1,'Bia Ferreira','#7A5BB5',45) RETURNING id`, [id])).rows.map((x) => x.id);
 
     const srv = (await db.query<{ id: string }>(
       `INSERT INTO servicos (studio_id, nome, preco, duracao_min, ciclo_dias, cor, sinal_pct) VALUES

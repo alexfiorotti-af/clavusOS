@@ -29,7 +29,7 @@ export function montarWeb(pedido: Pedido, studio: Studio, usuario: Usuario, serv
     pedido, studio, usuario, servicos, avisos,
     hoje: hojeEm(studio.fuso, servicos.agora()),
     db: (trabalho, papel) => comStudio({ studioId: studio.id, usuarioId: usuario.id, papel: papel ?? usuario.papel, fuso: studio.fuso }, trabalho),
-    tela: (titulo, conteudo, opc = {}) => html(pagina({ titulo, studio, usuario, conteudo, avisos, ativo: opc.ativo, largo: opc.largo, caminho: pedido.caminho }), opc.status ?? 200,
+    tela: (titulo, conteudo, opc = {}) => html(pagina({ titulo, studio, usuario, conteudo, avisos, ativo: opc.ativo, largo: opc.largo, caminho: pedido.caminho, busca: pedido.query.toString() }), opc.status ?? 200,
       avisos.length ? { "set-cookie": apagarCookie(COOKIE_AVISO, seguro) } : {}),
     voltar: (para, aviso) => redirecionar(para, aviso ? { "set-cookie": cookieSessao(COOKIE_AVISO, `${aviso.tipo}:${aviso.texto}`, { maxAgeSeg: 60, seguro }) } : {}),
   };

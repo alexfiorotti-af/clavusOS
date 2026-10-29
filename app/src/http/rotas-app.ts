@@ -45,6 +45,11 @@ export async function rotasApp(w: Web): Promise<Resposta | null> {
     return w.tela("Hoje", TA.telaHoje({ studio: w.studio, hoje: w.hoje, ags, totalDia: total, vencidas: n.vencidas, aniversarios: n.aniversarios }), { ativo: "/" });
   }
 
+  /* ---------- o botão "+": criar qualquer coisa ---------- */
+  if (p.caminho === "/novo" && p.metodo === "GET") {
+    return w.tela("Criar", TA.telaCriar({ hoje: w.hoje, financeiro: pode(w.usuario.papel, "financeiro") }), { ativo: "/novo" });
+  }
+
   /* ---------- agenda ---------- */
   if (p.caminho === "/agenda" && p.metodo === "GET") {
     const dia = diaDaQuery(w);

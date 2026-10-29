@@ -1,6 +1,6 @@
 /** Telas de clientes: lista com filtros (vencidas, aniversários, leads), ficha e formulário. */
 import { e } from "../http/resposta.ts";
-import { etiqueta, opcoes } from "./base.ts";
+import { etiqueta, opcoes, anelCiclo, ICONE } from "./base.ts";
 import { ORIGENS, type Cliente, type Contagens } from "../clientes/clientes.ts";
 import type { Agendamento } from "../agenda/agenda.ts";
 import type { AssinaturaCliente } from "../planos/planos.ts";
@@ -24,32 +24,33 @@ function zapVencida(c: Cliente, hoje: DiaISO, studioNome: string): string {
 function subCliente(c: Cliente, hoje: DiaISO): string {
   const partes: string[] = [];
   if (c.situacao === "lead") partes.push(etiqueta("lead") + ` <span class="mudo">${e(ORIGENS[c.origem] ?? c.origem)}</span>`);
-  if (c.vence_em && c.vence_em < hoje) partes.push(`<span class="etiqueta e-vencida-unha">vencida há ${diasEntre(c.vence_em, hoje)}d</span>`);
-  else if (c.vence_em) partes.push(`<span class="mudo">vence ${brCurto(c.vence_em)}</span>`);
-  if (c.nascimento && c.nascimento.slice(5, 7) === hoje.slice(5, 7)) partes.push(`<span class="etiqueta e-niver">🎂 ${c.nascimento.slice(8)}/${c.nascimento.slice(5, 7)}</span>`);
+  if (c.vence_em && c.vence_em < hoje) partes.push(`<span class="etiqueta e-vencida-unha">vencida há ${diasEntre(c.vence_em, hoje)} dias</span>`);
+  else if (c.vence_em) partes.push(`volta por volta de ${brCurto(c.vence_em)}`);
+  if (c.nascimento && c.nascimento.slice(5, 7) === hoje.slice(5, 7)) partes.push(`<span class="etiqueta e-niver">aniversário ${c.nascimento.slice(8)}/${c.nascimento.slice(5, 7)}</span>`);
   return partes.length ? partes.join(" ") : `<span class="mudo">${e(fmtFone(c.telefone)) || "sem telefone"}</span>`;
 }
 
 export function telaClientes(o: { hoje: DiaISO; studioNome: string; filtro: string; q: string; lista: Cliente[]; n: Contagens }): string {
   const pills: [string, string, number][] = [
     ["todas", "Todas", o.n.total], ["vencidas", "Unha vencida", o.n.vencidas],
-    ["aniversarios", "🎂 Aniversários", o.n.aniversarios], ["leads", "Leads", o.n.leads]];
+    ["aniversarios", "Aniversário", o.n.aniversarios], ["leads", "Leads", o.n.leads]];
   return `
 <h1>Clientes</h1>
-${o.n.vencidas && o.filtro !== "vencidas" ? `<a class="banner" href="/clientes?filtro=vencidas">💅 <b>${o.n.vencidas} cliente${o.n.vencidas > 1 ? "s" : ""} com unha vencida</b> — campanha de retorno pronta ›</a>` : ""}
+${o.n.vencidas && o.filtro !== "vencidas" ? `<a class="banner" href="/clientes?filtro=vencidas"><span class="ic">${ICONE.unha}</span><span class="tx"><b>${o.n.vencidas} passaram do tempo da unha</b><small>Chame de volta antes que marquem com outra</small></span>${ICONE.seta}</a>` : ""}
 <div class="pilulas">${pills.map(([f, t, n]) =>
   `<a class="pill ${o.filtro === f ? "ativa" : ""}" href="/clientes?filtro=${f}">${t}${n && f !== "todas" ? `<span class="n">${n}</span>` : ""}</a>`).join("")}
-<a class="pill" href="/clientes/nova">+ Nova cliente</a></div>
+</div>
 <form method="get" action="/clientes" class="campo" style="max-width:420px">
   <input type="hidden" name="filtro" value="${e(o.filtro)}">
-  <input type="search" name="q" placeholder="Buscar por nome ou telefone…" value="${e(o.q)}">
+  <input type="search" name="q" aria-label="Buscar cliente" placeholder="Buscar por nome ou WhatsApp" value="${e(o.q)}">
 </form>
-${o.lista.length ? `<div style="margin-top:12px">${o.lista.map((c) => `
+${o.lista.length ? `<div class="lista" style="margin-top:12px">${o.lista.map((c) => `
 <a class="ag" href="/clientes/${c.id}">
-  <span class="avatar">${e(c.nome.split(" ").map((p) => p[0]).slice(0, 2).join(""))}</span>
+  ${anelCiclo(c.nome, c.ultima ? diasEntre(c.ultima, o.hoje) : null, c.ultima && c.vence_em ? diasEntre(c.ultima, c.vence_em) : null)}
   <div class="meio"><b>${e(c.nome)}</b><span>${subCliente(c, o.hoje)}</span></div>
-  ${o.filtro === "vencidas" ? `<span class="fim"><span class="botao zap pequeno" onclick="event.preventDefault();window.open('${zapVencida(c, o.hoje, o.studioNome)}','_blank')">💬 chamar</span></span>` : `<span class="mudo">›</span>`}
-</a>`).join("")}</div>` : `<div class="cartao"><p class="mudo">Ninguém por aqui ${o.q ? "com essa busca" : "ainda"} 🌸</p></div>`}`;
+  ${o.filtro === "vencidas" ? `<span class="fim"><span class="botao zap pequeno" role="link" tabindex="0" onclick="event.preventDefault();window.open('${zapVencida(c, o.hoje, o.studioNome)}','_blank')">${ICONE.zap} Chamar</span></span>` : `<span class="mudo">${ICONE.seta}</span>`}
+</a>`).join("")}</div>
+<p class="mudo">O anel em volta da foto é o tempo desde a última unha: enche até a data de voltar. Vermelho é vencida.</p>` : `<div class="cartao"><p class="mudo">Ninguém por aqui ${o.q ? "com essa busca" : "ainda"}. <a href="/clientes/nova">Cadastrar cliente</a></p></div>`}`;
 }
 
 export function telaCliente(o: { c: Cliente; hoje: DiaISO; studioNome: string; hist: Agendamento[]; assinatura: AssinaturaCliente | null }): string {
@@ -59,17 +60,17 @@ export function telaCliente(o: { c: Cliente; hoje: DiaISO; studioNome: string; h
 <h1>${e(c.nome)} ${c.situacao !== "ativa" ? etiqueta(c.situacao) : ""}</h1>
 <div class="cartao">
   <p class="mudo">${e(fmtFone(c.telefone)) || "sem telefone"}${c.email ? ` · ${e(c.email)}` : ""} · origem: ${e(ORIGENS[c.origem] ?? c.origem)}
-  ${c.nascimento ? ` · 🎂 ${c.nascimento.slice(8)}/${c.nascimento.slice(5, 7)}` : ""}${c.cpf ? ` · CPF ${e(c.cpf)}` : ""}</p>
-  ${c.observacoes ? `<p class="mudo">📝 ${e(c.observacoes)}</p>` : ""}
+  ${c.nascimento ? ` · ${c.nascimento.slice(8)}/${c.nascimento.slice(5, 7)}` : ""}${c.cpf ? ` · CPF ${e(c.cpf)}` : ""}</p>
+  ${c.observacoes ? `<p class="mudo"> ${e(c.observacoes)}</p>` : ""}
   ${c.ultima ? (vencida
-    ? `<p class="banner" style="margin:10px 0 0">💅 Unha <b>vencida há ${diasEntre(c.vence_em!, o.hoje)} dia(s)</b> — última (${e(c.servico_nome ?? "")}) em ${br(c.ultima)}</p>`
-    : c.vence_em ? `<p class="banner suave" style="margin:10px 0 0">💅 Última unha em ${br(c.ultima)} · vence em ${br(c.vence_em)}</p>` : `<p class="mudo">Última unha em ${br(c.ultima)}</p>`) : ""}
-  ${o.assinatura ? `<p>🔁 Assinatura ativa: <b>${e(o.assinatura.plano_nome)}</b> · ${reais(o.assinatura.preco)}/${e(o.assinatura.periodo)} · dias ${o.assinatura.dias_mes.join(", ")} às ${e(o.assinatura.hora)}${o.assinatura.pago_ate ? ` · paga até ${br(o.assinatura.pago_ate)}` : ""} — <a href="/configuracoes/planos">gerenciar</a></p>` : ""}
+    ? `<p class="banner" style="margin:10px 0 0"> Unha <b>vencida há ${diasEntre(c.vence_em!, o.hoje)} dia(s)</b> — última (${e(c.servico_nome ?? "")}) em ${br(c.ultima)}</p>`
+    : c.vence_em ? `<p class="banner suave" style="margin:10px 0 0"> Última unha em ${br(c.ultima)} · vence em ${br(c.vence_em)}</p>` : `<p class="mudo">Última unha em ${br(c.ultima)}</p>`) : ""}
+  ${o.assinatura ? `<p> Assinatura ativa: <b>${e(o.assinatura.plano_nome)}</b> · ${reais(o.assinatura.preco)}/${e(o.assinatura.periodo)} · dias ${o.assinatura.dias_mes.join(", ")} às ${e(o.assinatura.hora)}${o.assinatura.pago_ate ? ` · paga até ${br(o.assinatura.pago_ate)}` : ""} — <a href="/configuracoes/planos">gerenciar</a></p>` : ""}
   <div class="acoes">
-    <a class="botao" href="/agenda/novo?cliente=${c.id}">Agendar horário ✨</a>
-    ${vencida ? `<a class="botao zap" target="_blank" rel="noopener" href="${zapVencida(c, o.hoje, o.studioNome)}">Chamar de volta 💅💬</a>`
+    <a class="botao" href="/agenda/novo?cliente=${c.id}">Agendar horário</a>
+    ${vencida ? `<a class="botao zap" target="_blank" rel="noopener" href="${zapVencida(c, o.hoje, o.studioNome)}">Chamar de volta</a>`
       : c.telefone ? `<a class="botao zap" target="_blank" rel="noopener" href="https://wa.me/${e(c.telefone)}?text=${encodeURIComponent(`Oi, ${c.nome.split(" ")[0]}! 💖`)}">WhatsApp 💬</a>` : ""}
-    ${!o.assinatura ? `<a class="botao sec" href="/configuracoes/planos?cliente=${c.id}">Vender plano 🔁</a>` : ""}
+    ${!o.assinatura ? `<a class="botao sec" href="/configuracoes/planos?cliente=${c.id}">Vender plano</a>` : ""}
     <a class="botao sec" href="/clientes/${c.id}/editar">Editar</a>
   </div>
 </div>
@@ -80,7 +81,7 @@ ${o.hist.length ? o.hist.map((a) => cardAg(a, o.hoje, true)).join("") : `<p clas
 export function telaClienteForm(o: { c?: Cliente | null; voltar?: string }): string {
   const c = o.c ?? null;
   return `
-<h1>${c ? "Editar cliente" : "Nova cliente"} 💕</h1>
+<h1>${c ? "Editar cliente" : "Nova cliente"}</h1>
 <form method="post" action="${c ? `/clientes/${c.id}/editar` : "/clientes/nova"}" class="cartao">
   ${o.voltar ? `<input type="hidden" name="voltar" value="${e(o.voltar)}">` : ""}
   <div class="linha">
@@ -101,6 +102,6 @@ export function telaClienteForm(o: { c?: Cliente | null; voltar?: string }): str
       <div><label>UF</label><input name="uf" maxlength="2" value="${e(c?.uf ?? "")}"></div>
     </div>
   </details>
-  <div class="acoes"><button>Salvar ✨</button> <a class="botao sec" href="${c ? `/clientes/${c.id}` : "/clientes"}">Voltar</a></div>
+  <div class="acoes"><button>Salvar</button> <a class="botao sec" href="${c ? `/clientes/${c.id}` : "/clientes"}">Voltar</a></div>
 </form>`;
 }

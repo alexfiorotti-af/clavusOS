@@ -14,7 +14,7 @@ export function telaCobrancaClavus(o: {
   const renova = !!s.assinatura_asaas_id && !s.assinatura_cancelada_em;
   const topo = `<div class="cartao"><h3>${ESTADOS[o.acesso.estado]}</h3>
     <p>${o.acesso.estado === "teste" ? `Teste gratuito até <b>${br(o.acesso.ate!)}</b> (${o.acesso.diasRestantes} dia${o.acesso.diasRestantes === 1 ? "" : "s"}).`
-      : o.acesso.estado === "ativo" ? (s.plano === "cortesia" ? "Este studio é cortesia — nada a pagar. 💖" : `Acesso pago até <b>${br(o.acesso.ate!)}</b>.${renova ? " A assinatura renova sozinha." : ""}`)
+      : o.acesso.estado === "ativo" ? (s.plano === "cortesia" ? "Este studio é cortesia — nada a pagar." : `Acesso pago até <b>${br(o.acesso.ate!)}</b>.${renova ? " A assinatura renova sozinha." : ""}`)
       : o.acesso.estado === "carencia" ? `Pagamento pendente: o sistema bloqueia em <b>${br(o.acesso.ate!)}</b>. Nada é apagado.`
       : `Acesso bloqueado desde ${br(o.acesso.ate!)}. Pague para voltar — está tudo guardado.`}</p></div>`;
   const acoes = s.plano === "cortesia" ? "" : o.temAsaasAF ? `
@@ -22,7 +22,7 @@ export function telaCobrancaClavus(o: {
   <div class="cartao"><h3>Assinatura mensal · ${e(o.precoMensal)}/mês</h3>
     <p class="mudo">Fatura todo mês pelo Asaas — você escolhe Pix, boleto ou cartão (no cartão, renova sozinha). Cancele quando quiser: vale até o fim do período pago.</p>
     ${renova ? `<form method="post" action="/configuracoes/cobranca/cancelar"><button class="perigo" data-confirmar>Cancelar assinatura</button></form>`
-      : `<form method="post" action="/configuracoes/cobranca/assinar"><button>Assinar o ClavusOS ✨</button></form>`}
+      : `<form method="post" action="/configuracoes/cobranca/assinar"><button>Assinar o ClavusOS</button></form>`}
   </div>
   <div class="cartao"><h3>Pagamento avulso</h3>
     <p class="mudo">Sem renovação automática: pague 1, 3, 6 ou 12 meses numa cobrança só.</p>
@@ -44,10 +44,10 @@ ${o.faturas.map((f) => `<tr><td>${br(f.vencimento)}${f.avulsa ? ` <span class="m
 
 export function telaBloqueado(s: Studio, acesso: Acesso, admin: boolean): string {
   return `<div class="entrada"><div class="cartao">
-  <h1>Acesso bloqueado 🔒</h1>
+  <h1>Acesso bloqueado</h1>
   <p>O pagamento do ClavusOS do <b>${e(s.nome)}</b> está pendente${acesso.ate ? ` desde ${br(acesso.ate)}` : ""}.
   <b>Nada foi apagado</b>: agenda, clientes e caixa continuam guardados.</p>
-  ${admin ? `<div class="acoes"><a class="botao" href="/configuracoes/cobranca">Ver a cobrança e reativar ✨</a>
+  ${admin ? `<div class="acoes"><a class="botao" href="/configuracoes/cobranca">Ver a cobrança e reativar</a>
   <a class="botao sec" href="/configuracoes/exportar">Exportar meus dados</a></div>`
     : `<p class="mudo">Avise a responsável pelo studio para reativar.</p>`}
 </div></div>`;

@@ -15,11 +15,11 @@ export type Agendamento = {
   origem: string; encaixe: boolean; ativo: boolean; observacoes: string | null;
   criado_em: string; concluido_em: string | null;
   cliente_nome?: string; cliente_telefone?: string | null; cliente_email?: string | null;
-  servico_nome?: string; servico_cor?: string; profissional_nome?: string | null;
+  servico_nome?: string; servico_cor?: string; profissional_nome?: string | null; profissional_cor?: string | null;
 };
 
 const CAMPOS = `a.*, a.data::text AS data, c.nome AS cliente_nome, c.telefone AS cliente_telefone, c.email AS cliente_email,
-  s.nome AS servico_nome, s.cor AS servico_cor, p.nome AS profissional_nome`;
+  s.nome AS servico_nome, s.cor AS servico_cor, p.nome AS profissional_nome, p.cor AS profissional_cor`;
 const DE = `FROM agendamentos a JOIN clientes c ON c.id = a.cliente_id JOIN servicos s ON s.id = a.servico_id
   LEFT JOIN profissionais p ON p.id = a.profissional_id`;
 

@@ -1,10 +1,7 @@
 <svg width="512" height="512" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-<circle cx="60" cy="60" r="56" stroke="#E91E8C" stroke-width="3"/>
-<g transform="translate(12 12) scale(0.8)">
-<g transform="rotate(-20 48 48)" stroke="#E91E8C" fill="none">
-<path d="M48 12 C58 30 64 52 64 68 C64 82 57 90 48 90 C39 90 32 82 32 68 C32 52 38 30 48 12 Z" stroke-width="6" stroke-linejoin="round"/>
-<path d="M41 75.5 Q48 69 55 75.5" stroke-width="4.5" stroke-linecap="round"/>
-</g>
-<circle cx="30" cy="8" r="6" fill="#B8860B"/>
+<circle cx="60" cy="60" r="60" fill="#A8174A"/>
+<g transform="translate(20 20) scale(0.84)">
+<g transform="rotate(-20 48 48)"><path d="M48 12 C58 30 64 52 64 68 C64 82 57 90 48 90 C39 90 32 82 32 68 C32 52 38 30 48 12 Z" fill="#F7F2EF"/><path d="M39 77.5 Q48 68.5 57 77.5 Q48 73.5 39 77.5 Z" fill="#A8174A"/></g>
+<circle cx="30" cy="8" r="6.5" fill="#E3C27A"/>
 </g>
 </svg>

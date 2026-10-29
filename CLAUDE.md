@@ -25,6 +25,8 @@ construtor de SaaS da casa (o primeiro é o CoachOS; o padrão de engenharia é 
 - Sem framework e sem dependência nova sem decisão registrada. Hoje só `pg`.
 - Linguagem da interface: português simples, tom do nicho (sem jargão de software). Botões dizem
   o que fazem.
+- **Visual: seguir `docs/MARCA.md` e a skill da casa `af-interface-saas`** (navegação em um andar,
+  porcelana + ameixa + a cor do studio, nada de emoji como ícone, borda colorida ou caixa alta).
 - **A marca mora em `app/src/marca.ts`**: símbolo, paleta e slogan. Favicon, cabeçalho, e-mails e
   vitrine importam de lá; nenhum desenho da marca vive em outro arquivo.
 
