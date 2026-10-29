@@ -1,0 +1,8 @@
+<svg width="1176" height="240" viewBox="0 0 470 96" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ClavusOS">
+<g transform="rotate(-20 48 48)" stroke="#E91E8C" fill="none">
+<path d="M48 12 C58 30 64 52 64 68 C64 82 57 90 48 90 C39 90 32 82 32 68 C32 52 38 30 48 12 Z" stroke-width="5.5" stroke-linejoin="round"/>
+<path d="M41 75.5 Q48 69 55 75.5" stroke-width="4" stroke-linecap="round"/>
+</g>
+<circle cx="30" cy="8" r="5.5" fill="#FFE082"/>
+<text x="104" y="64" font-family='"Fraunces", Georgia, serif' font-weight="600" font-size="52" letter-spacing="-1" fill="#FFF7FB">ClavusOS</text>
+</svg>

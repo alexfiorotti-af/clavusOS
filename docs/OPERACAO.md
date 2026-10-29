@@ -20,7 +20,8 @@
 | `CLAVUS_DATABASE_URL` | conexão do Postgres (usuário dono do esquema; o app assume `clavus_app` em cada transação) |
 | `CLAVUS_DOMINIO_BASE` | domínio do produto, ex. `clavusos.com.br` — o studio é `<slug>.<domínio>` |
 | `CLAVUS_STUDIO_PADRAO` | slug usado quando o Host não traz subdomínio (só instalação de um studio; em produção, vazia — a raiz é a vitrine) |
-| `CLAVUS_WHATSAPP`, `CLAVUS_EMAIL_COMERCIAL`, `CLAVUS_PRECO_MENSAL`, `CLAVUS_DEMO_SLUG`, `CLAVUS_DEMO_SENHA` | a vitrine da raiz |
+| `CLAVUS_WHATSAPP`, `CLAVUS_EMAIL_COMERCIAL`, `CLAVUS_PRECO_MENSAL` | a vitrine da raiz (o preço também é o valor REAL da mensalidade cobrada no Asaas) |
+| `CLAVUS_DEMO_SLUG`, `CLAVUS_DEMO_SENHA` | o studio de demonstração (produção: `studio`); a vitrine mostra a entrada de gerência com essa senha — ela é pública de propósito |
 | `CLAVUS_ASAAS_AF_CHAVE`, `CLAVUS_ASAAS_AF_AMBIENTE` (`sandbox`\|`producao`), `CLAVUS_ASAAS_AF_WEBHOOK_TOKEN` | a **conta Asaas da AF**, que cobra a mensalidade do ClavusOS (tela Cobrança). Sem a chave, o botão Assinar vira "fale com a AF" |
 | `CLAVUS_TESTE_DIAS` (7), `CLAVUS_CARENCIA_DIAS` (5) | teste gratuito e carência antes do bloqueio |
 | `CLAVUS_CHAVE_MESTRA` | 64 hex; cifra a chave Asaas de cada studio (AES-256-GCM). **Gerar uma vez e nunca trocar sem migrar os segredos** |
@@ -50,8 +51,12 @@ Gerar chave-mestra/rotina: `node -e "console.log(require('crypto').randomBytes(3
 - **Raiz** (`CLAVUS_DOMINIO_BASE` sem subdomínio): a vitrine do produto, sem studio.
 - **Studio** = `<slug>.<domínio>`. `CLAVUS_STUDIO_PADRAO` só serve a instalação de um studio;
   em produção fica **vazia**. Em desenvolvimento, `?studio=slug` também resolve.
-- **Demonstração** = `modelo.<domínio>` (Studio Lume, fictício, plano cortesia): entradas
-  `demo@<domínio>` (administradora) e `equipe@<domínio>` (profissional), senha `CLAVUS_DEMO_SENHA`.
+- **Demonstração** = `<CLAVUS_DEMO_SLUG>.<domínio>` (em produção: `studio.clavusos.com.br` —
+  Studio Lume, fictício, plano cortesia). Entradas: `demo@<domínio>` (administradora — não
+  divulgar), `gerencia@<domínio>` (gerência — é a que a vitrine mostra) e `equipe@<domínio>`
+  (profissional); senha única = `CLAVUS_DEMO_SENHA` (por aparecer na vitrine, é pública de
+  propósito). Recriar do zero: `GET /rotina/renovar-demo?chave=<CLAVUS_CHAVE_ROTINA>` —
+  é o que o cron mensal chama; local, `npm run studio-modelo`.
 - **Página pública da cliente** = `<slug>.<domínio>/agendar` (liga/desliga em Configurações).
 
 ## 4a. Studio novo = três passos
@@ -63,11 +68,23 @@ Gerar chave-mestra/rotina: `node -e "console.log(require('crypto').randomBytes(3
 
 ## 5. Rotina (o relógio de fora)
 
-Cloudflare Worker (ou cron da hospedagem) chama a cada hora:
-`GET https://<domínio>/rotina/diaria?chave=<CLAVUS_CHAVE_ROTINA>`
-Para cada studio: sincroniza cobranças pendentes com o Asaas (studio e AF), marca vencidas,
-manda o lembrete de amanhã às clientes com e-mail, avisa vencimento da mensalidade do ClavusOS
-(3 dias antes, no dia, na carência) e limpa sessões. Idempotente: chamar duas vezes não repete nada.
+Dois endereços, a mesma chave (`CLAVUS_CHAVE_ROTINA`), os dois idempotentes:
+
+| Endereço | Cadência | O que faz |
+|---|---|---|
+| `https://clavusos.com.br/rotina/diaria?chave=…` | **a cada hora** | por studio: sincroniza cobranças com o Asaas (studio e AF), marca vencidas, lembrete de amanhã por e-mail, aviso da mensalidade (3 dias antes, no dia, na carência), limpa sessões |
+| `https://clavusos.com.br/rotina/renovar-demo?chave=…` | **dia 1 de cada mês** | apaga e recria o studio de demonstração com a base de apresentação |
+
+**Configurar no cron-job.org** (grátis, sem terminal): criar conta → CREATE CRONJOB →
+Title `ClavusOS rotina` → URL completa com a chave → Execution schedule: **Every 1 hour**
+(deixe o minuto que ele sugerir) → Save. Repetir para `ClavusOS renovar demo` com schedule
+**Every month, day 1, 05:00**. Em "Notifications", ligue o aviso de falha.
+
+**Alternativa (hPanel da Hostinger → Avançado → Cron Jobs)**, se o plano oferecer:
+`curl -s "https://clavusos.com.br/rotina/diaria?chave=SUACHAVE" >/dev/null 2>&1` de hora em
+hora, e o `renovar-demo` com cadência mensal.
+
+Teste manual: abrir a URL no navegador — a resposta é um JSON com o relatório.
 
 ## 5a. Backup enquanto o Supabase for Free
 

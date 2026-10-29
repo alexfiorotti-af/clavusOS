@@ -60,6 +60,18 @@ async function despachar(p: Pedido, s: Servicos): Promise<Resposta> {
     try { return json({ ok: true, resultado: await receberWebhookAF(p.corpo ?? "", ambiente, s.fetchFn) }); }
     catch (err) { console.error("[webhook asaas-af]", (err as Error).message); return json({ ok: false }, 500); }
   }
+  if (p.caminho === "/rotina/renovar-demo") {
+    // Apaga e recria o studio de demonstração (CLAVUS_DEMO_SLUG) com a base de apresentação.
+    // O cron mensal chama esta rota; a chave é a mesma da rotina.
+    const chave = p.query.get("chave") ?? cabecalho(p, "x-chave");
+    if (!ambiente.chaveRotina || !iguais(chave, ambiente.chaveRotina)) return texto("chave inválida", 401);
+    if (!ambiente.demoSlug) return json({ ok: false, motivo: "CLAVUS_DEMO_SLUG vazio: demonstração desligada" }, 400);
+    try {
+      const { recriarDemo } = await import("../ferramentas/demo.ts");
+      const r = await recriarDemo({ slug: ambiente.demoSlug, dominioBase: ambiente.dominioBase, senha: ambiente.demoSenha ?? "demonstracao" });
+      return json({ ok: true, ...r });
+    } catch (err) { console.error("[renovar-demo]", err); return json({ ok: false, erro: (err as Error).message }, 500); }
+  }
   if (p.caminho === "/rotina/exportar") {
     // Backup de fora: JSON completo de um studio (`?slug=x`) ou a lista de slugs. Mesma chave da rotina.
     const chave = p.query.get("chave") ?? cabecalho(p, "x-chave");

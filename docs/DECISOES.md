@@ -48,3 +48,21 @@
   real (isolamento RLS, papéis, trava de choque, fluxo concluir→caixa, PDV, webhooks dos dois
   níveis com API falsa) + varredura HTTP de todas as telas e fluxos de escrita. Ritual de mudança:
   `npm run tipos && npm run teste` → registrar aqui se foi decisão → commit + push.
+- **D013 · 29/10/2026** — **Demonstração em produção = slug `studio`** (studio.clavusos.com.br,
+  alias estacionado; o "curinga" da Hostinger é o alias por slug, lição D010 do Pousa). A demo é
+  recriada pela rota `GET /rotina/renovar-demo?chave=<rotina>` — mesmo trabalho do CLI
+  `studio-modelo`, agora server-side, sem depender do PC do Alex — e o cron mensal a renova
+  (D009 do Pousa, sem a tarefa do Windows). Base de apresentação: 10 clientes (3 vencidas, 2
+  aniversariantes, 2 leads), 2 profissionais com comissão, agenda viva com encaixe e falta,
+  caixa com despesas e venda, plano com assinante paga e horários gerados. Entradas demo@/
+  gerencia@/equipe@; a vitrine divulga só a gerência; a senha da demo é pública de propósito.
+- **D014 · 29/10/2026** — **Identidade "Amêndoa & Verniz"**: símbolo construído em geometria
+  (unha amêndoa a −20° com lúnula e gota de verniz dourada), Fraunces no display + Poppins no
+  texto, paleta nomeada (Esmalte/Orquídea/Verniz/Ameixa/Pó de Arroz). O desenho mora em
+  `app/src/marca.ts`; assets por `scripts/gerar-marca.mjs` em `docs/marca/`; manual em
+  `docs/MARCA.md`. A vitrine da raiz virou página de venda completa na identidade (hero com a
+  UI real em recortes, faixa escura da unha vencida com a bolha de WhatsApp verdadeira, seção
+  Asaas, demonstração com credenciais, preço, FAQ). Geração por IA de imagem descartada — a
+  marca é código, como manda a casa (D018 do Pousa).
+- **D015 · 29/10/2026** — Hostinger: Diretório raiz `app` + Arquivo de entrada `entrada.mjs`
+  (importa o servidor no mesmo processo; Node 22.18+ faz o type stripping por padrão).
