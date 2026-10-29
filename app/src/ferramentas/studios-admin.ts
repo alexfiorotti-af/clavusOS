@@ -15,8 +15,8 @@ export async function criarStudio(n: NovoStudio): Promise<{ id: string; conviteT
   if (["www", "app", "api", "site", "modelo-reservado"].includes(slug)) throw new Error("Esse endereço é reservado.");
   const id = await semStudio(async (db) => {
     const r = await db.query<{ id: string }>(
-      `INSERT INTO studios (slug, nome, cidade, uf, plano, teste_ate, situacao)
-       VALUES ($1,$2,$3,$4,$5,$6,'teste') RETURNING id`,
+      `INSERT INTO studios (slug, nome, cidade, uf, plano, teste_ate, situacao, cor)
+       VALUES ($1,$2,$3,$4,$5,$6,'teste','#A8174A') RETURNING id`,
       [slug, n.nome, n.cidade ?? null, n.uf ?? null, n.cortesia ? "cortesia" : "teste",
         n.cortesia ? null : somarDias(hojeEm("America/Sao_Paulo"), n.testeDias)]);
     return r.rows[0].id;

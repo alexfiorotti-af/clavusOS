@@ -24,8 +24,8 @@ export async function recriarDemo(o: OpcoesDemo): Promise<ResultadoDemo> {
   const mm = hoje.slice(5, 7);
   await semStudio((db) => db.query("DELETE FROM studios WHERE slug = $1", [o.slug]));
   const id = await semStudio(async (db) => (await db.query<{ id: string }>(
-    `INSERT INTO studios (slug, nome, cidade, uf, telefone, email, plano, situacao, ciclo_dias, agendar_texto)
-     VALUES ($1,'Studio Lume','Vitória','ES','5500990000000',$2,'cortesia','ativo',25,
+    `INSERT INTO studios (slug, nome, cidade, uf, telefone, email, plano, situacao, ciclo_dias, cor, agendar_texto)
+     VALUES ($1,'Studio Lume','Vitória','ES','5500990000000',$2,'cortesia','ativo',25,'#A8174A',
              'Studio de demonstração do ClavusOS — marque à vontade, tudo aqui é fictício.') RETURNING id`,
     [o.slug, `demo@${o.dominioBase}`])).rows[0].id);
 
