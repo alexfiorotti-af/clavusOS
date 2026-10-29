@@ -44,7 +44,7 @@ export function telaStudio(s: Studio, equipe: (Usuario & { ultimo_acesso: string
     <div><label>Antecedência máxima (dias)</label><input type="number" name="agendar_antecedencia" min="1" max="365" value="${s.agendar_antecedencia}"></div>
   </div>
   <div class="campo"><label>Recado no topo da página <span class="mudo">(opcional)</span></label><input name="agendar_texto" value="${e(s.agendar_texto ?? "")}"></div>
-  <div class="acoes"><button>Salvar ✨</button></div>
+  <div class="acoes"><button>Salvar</button></div>
 </form>
 
 <h2>Equipe (quem entra no sistema)</h2>
@@ -61,7 +61,7 @@ ${equipe.map((u) => `<tr${u.ativo ? "" : ' style="opacity:.5"'}><td>${e(u.nome)}
   <div><label>E-mail</label><input name="email" type="email" required></div>
   <div><label>Papel</label><select name="papel">${opcoes(PAPEIS, "profissional")}</select></div></div>
   <p class="mudo">Ela recebe um link por e-mail (vale 3 dias) para criar a própria senha. Profissional vê a agenda e as clientes; gerência vê também o caixa; administrador vê tudo.</p>
-  <div class="acoes"><button>Convidar ✨</button></div>
+  <div class="acoes"><button>Convidar</button></div>
 </form></details></div>`;
 }
 
@@ -69,7 +69,7 @@ export function telaServicos(lista: (Srv & { ciclo_dias: number; sinal_pct: numb
   return `
 <h1>Serviços</h1>
 ${lista.map((s) => `<div class="ag" style="cursor:default">
-  <span class="avatar" style="background:${e(s.cor)}22;color:${e(s.cor)}">💅</span>
+  <span class="avatar" style="background:${e(s.cor)}22;color:${e(s.cor)}">${e(s.nome.slice(0, 1).toUpperCase())}</span>
   <div class="meio"><b>${e(s.nome)}</b><span>${s.duracao_min} min${s.ciclo_dias ? ` · vence em ${s.ciclo_dias}d` : ""}${s.sinal_pct ? ` · sinal ${s.sinal_pct}%` : ""}</span></div>
   <div class="fim"><span class="valor">${reais(s.preco)}</span><br>
   <a class="botao pequeno sec" href="/configuracoes/servicos?editar=${s.id}">editar</a>
@@ -91,7 +91,7 @@ export function telaServicoForm(s: (Srv & { ciclo_dias: number; sinal_pct: numbe
     <div><label>Sinal no agendamento online (%)</label><input type="number" name="sinal" min="0" max="100" value="${s?.sinal_pct ?? 0}"></div>
   </div>
   <div class="campo"><label>Cor</label><div class="chips">${CORES.map((c) => `<label class="chip"><input type="radio" name="cor" value="${c}" ${(s?.cor ?? CORES[0]) === c ? "checked" : ""}><span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:${c};vertical-align:-3px"></span></label>`).join("")}</div></div>
-  <div class="acoes"><button>Salvar ✨</button>${s ? ` <a class="botao sec" href="/configuracoes/servicos">cancelar</a>` : ""}</div>
+  <div class="acoes"><button>Salvar</button>${s ? ` <a class="botao sec" href="/configuracoes/servicos">cancelar</a>` : ""}</div>
 </form>`;
 }
 
@@ -100,12 +100,12 @@ export function telaProdutos(lista: { id: string; nome: string; preco: number; c
 <h1>Produtos</h1>
 <p class="mudo">Vendas entram no caixa pelo botão “Venda de produto” — com baixa de estoque.</p>
 ${lista.map((p) => `<div class="ag" style="cursor:default">
-  <span class="avatar">🛍</span>
+  <span class="avatar">${e(p.nome.slice(0, 1).toUpperCase())}</span>
   <div class="meio"><b>${e(p.nome)}</b><span>estoque: ${p.estoque} · custo ${reais(p.custo)}</span></div>
   <div class="fim"><span class="valor">${reais(p.preco)}</span><br>
   <a class="botao pequeno sec" href="/configuracoes/produtos?editar=${p.id}">editar</a>
   <form method="post" action="/configuracoes/produtos" style="display:inline"><input type="hidden" name="toggle" value="${p.id}"><button class="pequeno ${p.ativo ? "sec" : ""}">${p.ativo ? "desativar" : "ativar"}</button></form></div>
-</div>`).join("") || `<div class="cartao"><p class="mudo">Nenhum produto ainda 🛍</p></div>`}
+</div>`).join("") || `<div class="cartao"><p class="mudo">Nenhum produto ainda</p></div>`}
 <form method="post" action="/configuracoes/produtos" class="cartao" style="margin-top:14px">
   <h3>${editar ? "Editar produto" : "Novo produto"}</h3>
   ${editar ? `<input type="hidden" name="id" value="${editar.id}">` : ""}
@@ -115,7 +115,7 @@ ${lista.map((p) => `<div class="ag" style="cursor:default">
     <div><label>Custo (R$)</label><input name="custo" inputmode="decimal" value="${editar ? centavosBR(editar.custo) : ""}"></div>
     <div><label>Estoque</label><input type="number" name="estoque" min="0" value="${editar?.estoque ?? 0}"></div>
   </div>
-  <div class="acoes"><button>Salvar 🛍</button>${editar ? ` <a class="botao sec" href="/configuracoes/produtos">cancelar</a>` : ""}</div>
+  <div class="acoes"><button>Salvar</button>${editar ? ` <a class="botao sec" href="/configuracoes/produtos">cancelar</a>` : ""}</div>
 </form>`;
 }
 
@@ -128,7 +128,7 @@ ${lista.map((p) => `<div class="ag" style="cursor:default">
   <div class="meio"><b>${e(p.nome)}</b><span>comissão ${(p as Prof & { comissao_pct?: number }).comissao_pct ?? 0}%</span></div>
   <div class="fim"><a class="botao pequeno sec" href="/configuracoes/equipe?editar=${p.id}">editar</a>
   <form method="post" action="/configuracoes/equipe" style="display:inline"><input type="hidden" name="toggle" value="${p.id}"><button class="pequeno ${p.ativo ? "sec" : ""}">${p.ativo ? "desativar" : "ativar"}</button></form></div>
-</div>`).join("") || `<div class="cartao"><p class="mudo">Só você por enquanto 💪 — adicione quando a equipe crescer.</p></div>`}
+</div>`).join("") || `<div class="cartao"><p class="mudo">Só você por enquanto — adicione quando a equipe crescer.</p></div>`}
 <form method="post" action="/configuracoes/equipe" class="cartao" style="margin-top:14px">
   <h3>${editar ? "Editar profissional" : "Nova profissional"}</h3>
   ${editar ? `<input type="hidden" name="id" value="${editar.id}">` : ""}
@@ -139,7 +139,7 @@ ${lista.map((p) => `<div class="ag" style="cursor:default">
       ${usuarios.map((u) => `<option value="${u.id}"${editar?.usuario_id === u.id ? " selected" : ""}>${e(u.nome)} (${e(u.email)})</option>`).join("")}</select></div>
   </div>
   <div class="campo"><label>Cor dela no mapa</label><div class="chips">${CORES.map((c) => `<label class="chip"><input type="radio" name="cor" value="${c}" ${(editar?.cor ?? CORES[0]) === c ? "checked" : ""}><span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:${c};vertical-align:-3px"></span></label>`).join("")}</div></div>
-  <div class="acoes"><button>Salvar 👩‍🎨</button>${editar ? ` <a class="botao sec" href="/configuracoes/equipe">cancelar</a>` : ""}</div>
+  <div class="acoes"><button>Salvar</button>${editar ? ` <a class="botao sec" href="/configuracoes/equipe">cancelar</a>` : ""}</div>
 </form>`;
 }
 
@@ -148,14 +148,14 @@ export function telaPlanos(o: {
   clientes: Cliente[]; clientePre: string | null; editar: Plano | null; temAsaas: boolean;
 }): string {
   return `
-<h1>Planos e assinaturas 🔁</h1>
+<h1>Planos e assinaturas</h1>
 <div class="grade g2">
 ${o.planos.map((p) => `<div class="cartao">
   <h3>${e(p.nome)} ${p.ativo ? "" : etiqueta("inativa")}</h3>
   <p><span class="valor">${reais(p.preco)}</span>/${e(p.periodo)} · ${p.visitas_mes}x por mês · ${e(p.servico_nome ?? "")}</p>
   <div class="acoes"><a class="botao pequeno sec" href="/configuracoes/planos?editar=${p.id}">editar</a>
   <form method="post" action="/configuracoes/planos"><input type="hidden" name="toggle" value="${p.id}"><button class="pequeno sec">${p.ativo ? "desativar" : "ativar"}</button></form></div>
-</div>`).join("") || `<div class="cartao"><p class="mudo">Crie planos mensais, trimestrais, semestrais ou anuais e venda recorrência 🔁</p></div>`}
+</div>`).join("") || `<div class="cartao"><p class="mudo">Crie planos mensais, trimestrais, semestrais ou anuais e venda recorrência</p></div>`}
 </div>
 <form method="post" action="/configuracoes/planos" class="cartao">
   <h3>${o.editar ? "Editar plano" : "Novo plano"}</h3>
@@ -167,7 +167,7 @@ ${o.planos.map((p) => `<div class="cartao">
     <div><label>Visitas por mês</label><input type="number" name="visitas" min="1" max="10" value="${o.editar?.visitas_mes ?? 2}" required></div>
     <div><label>Serviço incluído</label><select name="servico_id" required>${o.servicos.map((s) => `<option value="${s.id}"${o.editar?.servico_id === s.id ? " selected" : ""}>${e(s.nome)}</option>`).join("")}</select></div>
   </div>
-  <div class="acoes"><button>Salvar plano 🔁</button>${o.editar ? ` <a class="botao sec" href="/configuracoes/planos">cancelar</a>` : ""}</div>
+  <div class="acoes"><button>Salvar plano</button>${o.editar ? ` <a class="botao sec" href="/configuracoes/planos">cancelar</a>` : ""}</div>
 </form>
 
 <h2>Vender assinatura</h2>
@@ -185,7 +185,7 @@ ${o.planos.map((p) => `<div class="cartao">
   <p class="mudo">${o.temAsaas
     ? "Com o Asaas conectado, a cobrança nasce automática: o Asaas fatura a cliente no ciclo do plano e o sistema dá baixa sozinho."
     : "Sem o Asaas conectado, a cobrança é manual: use “Registrar recebimento” a cada período (conecte o Asaas em Configurações → Asaas do studio para automatizar)."}</p>
-  <div class="acoes"><button>Ativar assinatura ✨</button></div>
+  <div class="acoes"><button>Ativar assinatura</button></div>
 </form>
 
 <h2>Assinaturas ativas</h2>
@@ -197,9 +197,9 @@ ${o.assinaturas.length ? o.assinaturas.map((a) => {
   ${a.pago_ate ? `Paga até <b>${br(a.pago_ate)}</b> ${atrasada ? etiqueta("vencida") : ""}` : `<span class="mudo">Nenhum pagamento registrado ainda</span>`}
   ${a.asaas_assinatura_id ? ` · <span class="mudo">cobrança automática pelo Asaas</span>` : ""}</p>
   <div class="acoes">
-    <form method="post" action="/configuracoes/planos/gerar"><input type="hidden" name="id" value="${a.id}"><button class="sec">Gerar horários deste mês 📅</button></form>
+    <form method="post" action="/configuracoes/planos/gerar"><input type="hidden" name="id" value="${a.id}"><button class="sec">Gerar horários deste mês</button></form>
     ${!a.asaas_assinatura_id ? `<form method="post" action="/configuracoes/planos/receber"><input type="hidden" name="id" value="${a.id}">
-      <button>Registrar recebimento ${reais(a.preco)} 💖</button></form>` : ""}
+      <button>Registrar recebimento ${reais(a.preco)}</button></form>` : ""}
     <form method="post" action="/configuracoes/planos/cancelar"><input type="hidden" name="id" value="${a.id}"><button class="perigo" data-confirmar>Cancelar assinatura</button></form>
   </div>
 </div>`;
@@ -208,7 +208,7 @@ ${o.assinaturas.length ? o.assinaturas.map((a) => {
 
 export function telaAsaasStudio(s: Studio, host: string): string {
   return `
-<h1>Asaas do studio 💳</h1>
+<h1>Asaas do studio</h1>
 <div class="cartao">
   <p>Com o Asaas conectado, você cobra as clientes por Pix, cartão, boleto ou link — sinal de horário, serviço e as assinaturas dos planos — e a baixa é automática. O dinheiro cai direto na <b>sua</b> conta Asaas; ele nunca passa pelo ClavusOS.</p>
   <p class="mudo">A chave fica guardada <b>cifrada</b> (AES-256) no banco. Cartão nunca passa pelo sistema: a cliente paga no checkout do próprio Asaas.</p>
@@ -218,7 +218,7 @@ export function telaAsaasStudio(s: Studio, host: string): string {
         <input name="chave" type="password" placeholder="${s.asaas_chave_cifrada ? "••••••••••••" : "$aact_..."}" autocomplete="off"></div>
       <div><label>Ambiente</label><select name="ambiente">${opcoes({ sandbox: "Sandbox (testes)", producao: "Produção (dinheiro de verdade)" }, s.asaas_ambiente)}</select></div>
     </div>
-    <div class="acoes"><button>${s.asaas_chave_cifrada ? "Salvar e testar" : "Conectar e testar"} ✨</button>
+    <div class="acoes"><button>${s.asaas_chave_cifrada ? "Salvar e testar" : "Conectar e testar"}</button>
     ${s.asaas_chave_cifrada ? `<button name="desconectar" value="1" class="perigo" data-confirmar>Desconectar</button>` : ""}</div>
   </form>
 </div>

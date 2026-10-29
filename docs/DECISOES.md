@@ -72,3 +72,19 @@
   base de pagantes). O valor vive em `CLAVUS_PRECO_MENSAL` — é o que a vitrine mostra E o que a
   assinatura cobra no Asaas da AF; mudar preço = mudar a variável e reiniciar o app (studios já
   assinados mantêm o valor da assinatura criada no Asaas).
+- **D017 · 29/10/2026** — **Redesign "Porcelana & Esmalte" + identidade "Cereja & Porcelana"**
+  (substitui o visual da D014). O Alex não gostou do visual (rosa/roxo do Material Design de
+  2014, degradê no topo, três andares de menu no celular) e aprovou o protótipo navegável.
+  Navegação em um andar: no celular, 4 abas embaixo (Hoje, Agenda, Clientes, Caixa) + botão "+"
+  central que abre `/novo` (criar horário, venda, lançamento ou cliente); no notebook, menu
+  lateral em ameixa. Visões de cada área (Dia/Semana/Equipe, Caixa/Relatórios, abas de
+  configuração) viram seletor dentro da página. Paleta: porcelana #F7F2EF, ameixa #2D1B2E e uma
+  cor de esmalte — a do studio (`studios.cor`), da qual os tons derivam com `color-mix`; a da
+  ClavusOS é a **Cereja #A8174A** (escolha do Alex). Fraunces macia (eixo SOFT) nos títulos e
+  valores + Instrument Sans no texto (sai a Poppins). Peças próprias do produto: a linha do dia
+  por profissional e o anel do ciclo da unha no avatar da cliente. Saem emoji como ícone,
+  borda colorida, caixa alta nos rótulos e contador de passos. Corrigidos: etiqueta esticada na
+  lista de clientes, item errado aceso no submenu com `?filtro=`, botão quebrando no caixa e o
+  ponto sobrando nas pílulas de dia. Migração `003_cor_cereja.sql`: padrão novo e studios no
+  padrão antigo acompanham a marca. Método registrado na skill da casa `af-interface-saas`
+  (github.com/alexfiorotti-af/af-interface-saas); manual de marca em `docs/MARCA.md`.

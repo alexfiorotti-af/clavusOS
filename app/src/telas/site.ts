@@ -9,7 +9,7 @@ import { e } from "../http/resposta.ts";
 import type { Ambiente } from "../ambiente.ts";
 import { simbolo, logoHorizontal, PALETA as P, FAVICON_SVG } from "../marca.ts";
 
-const FONTES = `<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Poppins:wght@400;500;600;700&display=swap">`;
+const FONTES = `<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,400..600,0..100&family=Instrument+Sans:wght@400;500;600&display=swap">`;
 
 export function telaVitrine(a: Ambiente): string {
   const zap = (msg: string) => `https://wa.me/${a.whatsappComercial}?text=${encodeURIComponent(msg)}`;
@@ -25,11 +25,11 @@ ${FONTES}
 :root{--rosa:${P.rosa};--rosa-escuro:${P.rosaEscuro};--petala:${P.rosaClaro};--lilas:${P.lilas};--verniz:${P.dourado};
 --verniz-claro:${P.douradoClaro};--ameixa:${P.ink};--suave:${P.inkSuave};--fundo:${P.fundo};--linha:${P.linha};--ok:${P.ok}}
 *{box-sizing:border-box}html{scroll-behavior:smooth}
-body{margin:0;background:var(--fundo);color:var(--ameixa);font:16px/1.6 Poppins,system-ui,sans-serif}
+body{margin:0;background:var(--fundo);color:var(--ameixa);font:16px/1.6 "Instrument Sans",system-ui,sans-serif}
 .c{max-width:1080px;margin:0 auto;padding:0 clamp(18px,4vw,32px)}
 a{color:var(--rosa-escuro)}
-h1,h2{font-family:Fraunces,Georgia,serif;font-weight:600;letter-spacing:-.015em;line-height:1.08;margin:0}
-.botao{display:inline-block;background:linear-gradient(135deg,var(--rosa),var(--lilas));color:#fff;font-weight:600;
+h1,h2{font-family:Fraunces,Georgia,serif;font-variation-settings:"SOFT" 100,"opsz" 96;font-weight:500;letter-spacing:-.02em;line-height:1.08;margin:0}
+.botao{display:inline-block;background:var(--rosa);color:#fff;font-weight:600;
   padding:15px 28px;border-radius:999px;text-decoration:none;font-size:15.5px}
 .botao.claro{background:#fff;color:var(--ameixa);border:1.5px solid var(--linha)}
 .botao:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--rosa);outline-offset:2px}
@@ -40,8 +40,6 @@ header nav a.entrar{text-decoration:none;font-weight:600;font-size:14.5px;color:
 header .botao{padding:11px 20px;font-size:14px}
 /* herói */
 .heroi{padding:clamp(28px,6vw,72px) 0 clamp(40px,7vw,84px);position:relative;overflow:hidden}
-.heroi::before{content:"";position:absolute;right:-180px;top:-120px;width:620px;height:620px;border-radius:50%;
-  background:radial-gradient(circle,rgba(233,30,140,.14),transparent 65%);pointer-events:none}
 .heroi .c{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(28px,5vw,64px);align-items:center;position:relative}
 .heroi h1{font-size:clamp(34px,5.2vw,58px)}
 .heroi p.sub{font-size:clamp(15.5px,1.8vw,18px);color:var(--suave);margin:20px 0 28px;max-width:34em}
@@ -56,7 +54,7 @@ header .botao{padding:11px 20px;font-size:14px}
 .ui.card b{display:block;font-size:15px}.ui.card span.srv{font-size:13px;color:var(--suave)}
 .ui.card .dir{margin-left:auto;text-align:right}
 .preco-mini{color:var(--verniz);font-weight:700}
-.tag{display:inline-block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:3px 9px;border-radius:999px}
+.tag{display:inline-block;font-size:12px;font-weight:500;padding:2px 10px;border-radius:999px}
 .tag.conf{background:#E3D5F1;color:#6A1B9A}.tag.pend{background:#FBF0DC;color:#A66B13}
 .ui.caixa{display:flex;gap:22px;transform:rotate(-1deg);width:max-content}
 .ui.caixa div b{font-size:19px;display:block}.ui.caixa div span{font-size:12px;color:var(--suave)}
@@ -65,7 +63,7 @@ header .botao{padding:11px 20px;font-size:14px}
 .recursos h2{font-size:clamp(26px,3.4vw,38px);max-width:18em}
 .recursos .grade{display:grid;grid-template-columns:1fr 1fr;gap:0 clamp(28px,5vw,72px);margin-top:16px}
 .rec{border-top:1.5px solid var(--linha);padding:22px 0}
-.rec h3{font:600 16.5px Poppins;margin:0 0 6px;display:flex;gap:10px;align-items:center}
+.rec h3{font:600 16.5px "Instrument Sans";margin:0 0 6px;display:flex;gap:10px;align-items:center}
 .rec p{margin:0;font-size:14.5px;color:var(--suave)}
 .gota{width:9px;height:9px;border-radius:50%;background:var(--rosa);flex:0 0 auto}
 /* a faixa escura: unha vencida */
@@ -85,8 +83,8 @@ header .botao{padding:11px 20px;font-size:14px}
 .demo-cartao{background:#fff;border:1.5px solid var(--linha);border-radius:20px;padding:26px 28px;display:flex;gap:28px;flex-wrap:wrap;align-items:center;margin-top:20px}
 .demo-cartao code{font-size:14px;background:var(--petala);border-radius:8px;padding:3px 9px}
 .preco{text-align:center;padding:clamp(44px,7vw,80px) 0}
-.preco .valor{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:clamp(52px,8vw,84px);color:var(--verniz);letter-spacing:-.02em}
-.preco .valor small{font-size:.35em;color:var(--suave);font-weight:400;font-family:Poppins}
+.preco .valor{font-family:Fraunces,Georgia,serif;font-variation-settings:"SOFT" 100;font-weight:500;font-size:clamp(52px,8vw,84px);color:var(--verniz);letter-spacing:-.02em}
+.preco .valor small{font-size:.35em;color:var(--suave);font-weight:400;font-family:"Instrument Sans"}
 .preco ul{list-style:none;padding:0;margin:18px auto 30px;color:var(--suave);font-size:15px;max-width:30em}
 .preco li{padding:4px 0}
 /* faq + rodapé */
@@ -121,16 +119,16 @@ footer p{margin:0;font-size:13px;color:var(--suave)}
     <p class="nota">${e(a.precoMensal)}/mês depois do teste · tudo incluso · sem fidelidade</p>
   </div>
   <div class="palco" aria-hidden="true">
-    <div class="ui alerta">💅 3 clientes com unha vencida — campanha pronta para enviar</div>
+    <div class="ui alerta"> 3 clientes com unha vencida — campanha pronta para enviar</div>
     <div class="ui card">
       <div class="hora">14:00<small>60 min</small></div>
       <div><b>Juliana Souza</b><span class="srv">Esmaltação em gel · Lia</span></div>
-      <div class="dir"><span class="preco-mini">R$ 70</span><br><span class="tag conf">confirmado</span></div>
+      <div class="dir"><span class="preco-mini">R$ 70</span><br><span class="tag conf">Confirmado</span></div>
     </div>
     <div class="ui card" style="transform:rotate(-0.8deg)">
       <div class="hora">15:30<small>75 min</small></div>
       <div><b>Renata Alves</b><span class="srv">Pé e mão · Bia</span></div>
-      <div class="dir"><span class="preco-mini">R$ 55</span><br><span class="tag pend">pendente</span></div>
+      <div class="dir"><span class="preco-mini">R$ 55</span><br><span class="tag pend">A confirmar</span></div>
     </div>
     <div class="ui caixa">
       <div><b>R$ 380</b><span>previsto hoje</span></div>
@@ -160,14 +158,14 @@ footer p{margin:0;font-size:13px;color:var(--suave)}
 
 <section class="vencida"><div class="c">
   <div>
-    <h2>A cliente sumiu?<br>O ClavusOS <span class="destaque">percebe antes de você.</span></h2>
+    <h2>A cliente sumiu?<br>O ClavusOS percebe antes de você.</h2>
     <p>Unha tem prazo de validade — e agenda vazia daqui a três semanas começa hoje. O sistema conta os dias
     desde a última unha de cada cliente e separa quem já passou do ciclo. Você abre a lista, toca em uma,
     e a mensagem já está escrita.</p>
   </div>
   <div>
     <div class="bolha">Oi, Juliana! 💅 Senti sua falta por aqui — já faz 32 dias desde a sua última unha.
-    Que tal garantir seu horário essa semana? Tenho encaixes ótimos te esperando ✨<small>21:47 ✓✓</small></div>
+    Que tal garantir seu horário essa semana? Tenho encaixes ótimos te esperando<small>21:47 ✓✓</small></div>
     <p class="legenda-bolha">A mensagem que o painel deixa pronta — um toque e foi pro WhatsApp dela.</p>
   </div>
 </div></section>
@@ -225,15 +223,15 @@ ${demo && a.demoSenha ? `<section class="faixa" style="padding-top:0;border:0"><
 
 export function telaStudioNaoEncontrado(slug: string, a: Ambiente): string {
   return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Studio não encontrado</title>${FONTES}<style>body{font-family:Poppins,system-ui;background:${P.fundo};color:${P.ink};display:grid;place-items:center;min-height:100vh;margin:0}
+<title>Studio não encontrado</title>${FONTES}<style>body{font-family:"Instrument Sans",system-ui;background:${P.fundo};color:${P.ink};display:grid;place-items:center;min-height:100vh;margin:0}
 div{max-width:460px;padding:24px;text-align:center}h1{font-family:Fraunces,Georgia,serif;font-weight:600}</style></head>
-<body><div>${simbolo({ tamanho: 44 })}<h1>Hmm… “${e(slug)}” não existe por aqui 💅</h1>
+<body><div>${simbolo({ tamanho: 44 })}<h1>Hmm… “${e(slug)}” não existe por aqui</h1>
 <p style="color:${P.inkSuave}">Confira o endereço com o studio, ou conheça o <a href="https://${e(a.dominioBase)}" style="color:${P.rosaEscuro}">ClavusOS</a>.</p></div></body></html>`;
 }
 
 export function telaSuspenso(nome: string): string {
   return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${e(nome)}</title>${FONTES}<style>body{font-family:Poppins,system-ui;background:${P.fundo};color:${P.ink};display:grid;place-items:center;min-height:100vh;margin:0}
+<title>${e(nome)}</title>${FONTES}<style>body{font-family:"Instrument Sans",system-ui;background:${P.fundo};color:${P.ink};display:grid;place-items:center;min-height:100vh;margin:0}
 div{max-width:460px;padding:24px;text-align:center}h1{font-family:Fraunces,Georgia,serif;font-weight:600}</style></head>
 <body><div>${simbolo({ tamanho: 44 })}<h1>${e(nome)}</h1>
 <p style="color:${P.inkSuave}">O acesso a este sistema está temporariamente suspenso. Fale com quem administra o contrato para reativar.
