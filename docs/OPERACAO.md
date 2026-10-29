@@ -8,7 +8,8 @@
   Única dependência de produção: o driver `pg`.
 - **Banco:** PostgreSQL 14+ (Supabase, região São Paulo). Migrações em `db/0NN_*.sql`;
   `npm run migrar` aplica as que faltam (ou cole no editor SQL do Supabase, "Run without RLS").
-- **Entrada na hospedagem:** `package.json` da raiz (`npm start` → `app/src/servidor.ts`).
+- **Entrada na hospedagem:** `app/entrada.mjs` (importa o servidor no mesmo processo).
+  Na Hostinger: Diretório raiz = `app`, Arquivo de entrada = `entrada.mjs`, Node 22.x, sem build.
 - **Todos os `npm run` são de dentro de `app/`.**
 - **Protótipo da Fase 1** (PWA offline) vive em `prototipo/` — é demo comercial, não produto.
 
@@ -97,8 +98,11 @@ Tudo o mais exige o slug no Host (ou o studio padrão).
 1. **Supabase** (região São Paulo): criar o projeto, pegar a **connection string de sessão**
    (pooler, porta 5432) → `CLAVUS_DATABASE_URL`. Rodar `npm run migrar` (ou colar `db/001` e
    `db/002` no editor SQL, "Run without RLS").
-2. **Hospedagem Node** (Hostinger com suporte a Node, ou VPS): subir o repositório, apontar a
-   entrada para `npm start` na raiz, preencher as variáveis do §2 (`CLAVUS_MODO=producao`).
+2. **Hospedagem Node** (Hostinger com suporte a Node, ou VPS): importar o repositório do GitHub,
+   Diretório raiz `app`, Arquivo de entrada `entrada.mjs`, Node 22.x, sem comando de build;
+   preencher as variáveis do §2 (`CLAVUS_MODO=producao`). **Não deixe variável em branco**:
+   linha vazia vale como valor vazio (um `PORT` em branco, por exemplo, derruba o app) —
+   preencha ou apague a linha.
 3. **Domínio**: apontar o domínio do produto e o curinga `*` para a hospedagem; HTTPS automático.
 4. **Resend**: conta + domínio verificado → `RESEND_API_KEY` e `CLAVUS_EMAIL_REMETENTE`.
 5. **Asaas da AF**: chave da conta AF (sandbox primeiro) + webhook do §6.
