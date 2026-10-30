@@ -28,6 +28,7 @@ import { estatico } from "./estaticos.ts";
 import { exportarStudio } from "../ferramentas/exportar.ts";
 import { telaBloqueado } from "../telas/cobranca.ts";
 import { telaVitrine, telaStudioNaoEncontrado, telaSuspenso } from "../telas/site.ts";
+import { telaPrivacidade, telaTermos } from "../telas/legal.ts";
 import { br } from "../dados/datas.ts";
 import { timingSafeEqual } from "node:crypto";
 
@@ -46,6 +47,8 @@ async function despachar(p: Pedido, s: Servicos): Promise<Resposta> {
   // 1. sem studio
   if (p.caminho === "/saude") return json({ ok: true, hora: s.agora().toISOString() });
   if (p.caminho.startsWith("/assets/")) return estatico(p.caminho.slice(8)) ?? texto("não encontrado", 404);
+  if (p.caminho === "/privacidade") return html(telaPrivacidade(ambiente));
+  if (p.caminho === "/termos") return html(telaTermos(ambiente));
   if (p.caminho === "/rotina/diaria") {
     const chave = p.query.get("chave") ?? cabecalho(p, "x-chave");
     if (!ambiente.chaveRotina || !iguais(chave, ambiente.chaveRotina)) return texto("chave inválida", 401);

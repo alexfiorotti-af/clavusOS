@@ -10,6 +10,7 @@
     "studios": "node --experimental-strip-types src/ferramentas/studios.ts",
     "studio-modelo": "node --experimental-strip-types src/ferramentas/studio-modelo.ts",
     "tipos": "tsc --noEmit",
+    "verificar": "node ../scripts/verificar.mjs",
     "teste": "npm run teste:puros && npm run teste:banco",
     "teste:puros": "node --experimental-strip-types --test src/dados/dinheiro.teste.ts src/dados/datas.teste.ts src/auth/senha.teste.ts src/http/cookie.teste.ts src/http/formulario.teste.ts src/agenda/horarios.teste.ts src/cobrancas/asaas.teste.ts src/studio/resolver.teste.ts src/assinatura/assinatura.teste.ts",
     "teste:banco": "node --experimental-strip-types --test src/db/banco.teste.ts"

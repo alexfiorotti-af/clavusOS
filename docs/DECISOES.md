@@ -88,3 +88,16 @@
   ponto sobrando nas pílulas de dia. Migração `003_cor_cereja.sql`: padrão novo e studios no
   padrão antigo acompanham a marca. Método registrado na skill da casa `af-interface-saas`
   (github.com/alexfiorotti-af/af-interface-saas); manual de marca em `docs/MARCA.md`.
+
+- **D018 · 30/10/2026** — **Verificador de segurança (`npm run verificar`) + páginas legais + correção dos relatórios.**
+  (1) Bug: `/relatorios` montava o fim do mês como `ym + "-31"`, data inexistente em meses de 30
+  dias e em fevereiro, derrubando a tela (foi o "erro inesperado" em nov/2026). Agora usa o último
+  dia real do mês (`somarDias(somarMeses(primeiro,1),-1)`), com teste de regressão. (2) `scripts/verificar.mjs`:
+  varre código (injeção de SQL, cabeçalhos, cookie, senha, webhook, tipos), repositório (segredo
+  versionado, histórico, `npm audit`) e banco ao vivo (RLS FORCE em toda tabela, isolamento entre
+  studios provado, integridade dos dados). Sai com erro se algo falhar; serve de CI depois.
+  (3) Endurecido o único `UPDATE` com coluna dinâmica (`studios-admin`) com allowlist de coluna.
+  (4) Páginas públicas `/privacidade` e `/termos` (`app/src/telas/legal.ts`) em linha com a LGPD —
+  AF controladora dos dados do studio, operadora dos dados das clientes finais; links no rodapé da
+  vitrine. (5) `docs/SEGURANCA.md`: posture, vetores de invasão testados e checklist da Hostinger.
+  Auditoria de 30/10: 27 checagens, 0 falhas; `npm audit` 0; dependência única `pg`.

@@ -217,7 +217,9 @@ ${demo && a.demoSenha ? `<section class="faixa" style="padding-top:0;border:0"><
 <footer><div class="c">
   <div style="display:flex;gap:12px;align-items:center">${simbolo({ tamanho: 28 })}<p><b style="color:var(--ameixa)">ClavusOS</b> · o sistema do studio de unhas</p></div>
   <p>AF Tecnologia e Marketing · <a href="${zap("Oi! Vim pelo site do ClavusOS")}">WhatsApp (27) 99601-5367</a> · ${e(a.emailComercial)}</p>
-</div></footer>
+</div>
+<div class="c" style="margin-top:14px"><p style="font-size:13px"><a href="/privacidade">Política de Privacidade</a> · <a href="/termos">Termos de Uso</a></p></div>
+</footer>
 </body></html>`;
 }
 
