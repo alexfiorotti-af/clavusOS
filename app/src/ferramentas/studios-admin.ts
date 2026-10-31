@@ -45,8 +45,13 @@ export async function listarStudios(): Promise<StudioLinha[]> {
 
 export async function mudarStudio(slug: string, mudanca: { situacao?: string; plano?: string; pago_ate?: string; teste_ate?: string }): Promise<void> {
   await semStudio(async (db) => {
+    const COLUNAS = new Set(["situacao", "plano", "pago_ate", "teste_ate"]); // allowlist: nome de coluna nunca vem solto na SQL
     const sets: string[] = []; const vals: unknown[] = [slug.toLowerCase()];
-    for (const [k, v] of Object.entries(mudanca)) { if (v !== undefined) { vals.push(v); sets.push(`${k} = $${vals.length}`); } }
+    for (const [k, v] of Object.entries(mudanca)) {
+      if (v === undefined) continue;
+      if (!COLUNAS.has(k)) throw new Error(`Campo não permitido: ${k}`);
+      vals.push(v); sets.push(`${k} = $${vals.length}`);
+    }
     if (!sets.length) return;
     const r = await db.query(`UPDATE studios SET ${sets.join(", ")} WHERE slug = $1`, vals);
     if (!r.rowCount) throw new Error("Studio não encontrado.");

@@ -3,7 +3,7 @@ import type { Resposta } from "./resposta.ts";
 import { campo, lerFormulario, marcado, inteiro } from "./formulario.ts";
 import { tentar, type Web } from "./contexto-web.ts";
 import { pode } from "../auth/sessao.ts";
-import { somarDias, diaDaSemana, diaValido, horaValida, hojeEm, type DiaISO } from "../dados/datas.ts";
+import { somarDias, somarMeses, diaDaSemana, diaValido, horaValida, hojeEm, type DiaISO } from "../dados/datas.ts";
 import { lerReais } from "../dados/dinheiro.ts";
 import * as Ag from "../agenda/agenda.ts";
 import { gradeDoDia, type Ocupado } from "../agenda/horarios.ts";
@@ -279,8 +279,10 @@ export async function rotasApp(w: Web): Promise<Resposta | null> {
   if (p.caminho === "/relatorios" && p.metodo === "GET") {
     if (!pode(w.usuario.papel, "financeiro")) return w.voltar("/", { tipo: "erro", texto: "Seu perfil não vê relatórios." });
     const ym = /^\d{4}-\d{2}$/.test(p.query.get("mes") ?? "") ? p.query.get("mes")! : w.hoje.slice(0, 7);
+    const primeiro = ym + "-01" as DiaISO;
+    const ultimo = somarDias(somarMeses(primeiro, 1), -1); // último dia real do mês (nunca 31 fixo)
     const dados = await w.db(async (db) => ({
-      resumo: await Cx.resumoDoPeriodo(db, ym + "-01", ym + "-31"),
+      resumo: await Cx.resumoDoPeriodo(db, primeiro, ultimo),
       recCat: await Rel.porCategoria(db, ym, "receita"),
       despCat: await Rel.porCategoria(db, ym, "despesa"),
       producao: await Rel.producaoPorProfissional(db, ym),

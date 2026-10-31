@@ -12,6 +12,15 @@ test("aritmética de dias e meses", () => {
   assert.equal(diasEntre("2026-10-01", "2026-10-27"), 26);
   assert.equal(diaDaSemana("2026-10-27"), 2, "terça");
 });
+test("último dia do mês nos relatórios nunca é 31 fixo", () => {
+  // O fim do mês é somarDias(somarMeses(primeiro,1),-1) — jamais um '-31' hardcoded,
+  // que em nov/fev/abr/jun/set vira data inexistente e derruba os relatórios.
+  const fim = (ym: string) => somarDias(somarMeses(ym + "-01", 1), -1);
+  assert.equal(fim("2026-11"), "2026-11-30", "novembro tem 30 dias");
+  assert.equal(fim("2026-02"), "2026-02-28");
+  assert.equal(fim("2028-02"), "2028-02-29", "bissexto");
+  assert.equal(fim("2026-12"), "2026-12-31");
+});
 test("minutos e choque", () => {
   assert.equal(minutos("14:30"), 870); assert.equal(hora(870), "14:30");
   assert.ok(cruzam(540, 600, 570, 630)); assert.ok(!cruzam(540, 600, 600, 660), "fim encosta no começo não é choque");
