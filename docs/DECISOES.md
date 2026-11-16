@@ -101,3 +101,11 @@
   AF controladora dos dados do studio, operadora dos dados das clientes finais; links no rodapé da
   vitrine. (5) `docs/SEGURANCA.md`: posture, vetores de invasão testados e checklist da Hostinger.
   Auditoria de 30/10: 27 checagens, 0 falhas; `npm audit` 0; dependência única `pg`.
+
+- **D019 · 16/11/2026** — **Views com `security_invoker` (brecha de isolamento corrigida).**
+  A view `clientes_ciclo` rodava com as permissões do dono e, para o papel da aplicação,
+  devolvia linhas de outros studios (provado ao vivo: 9 linhas de fora). As telas não expunham
+  isso, porque sempre a juntam com `clientes` (isolada), mas era uma brecha na trava. A auditoria
+  de 30/10 olhou tabelas e não views. Migração `004_views_security_invoker.sql`; teste de banco
+  que reprova view sem `security_invoker` ou que mostre outro studio; o `npm run verificar` checa
+  as duas coisas. Regra: toda view nova nasce com `WITH (security_invoker = true)`.
