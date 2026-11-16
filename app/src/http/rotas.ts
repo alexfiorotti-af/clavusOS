@@ -27,8 +27,9 @@ import { rotinaGeral, studiosAtivos } from "../rotina/rotina.ts";
 import { estatico } from "./estaticos.ts";
 import { exportarStudio } from "../ferramentas/exportar.ts";
 import { telaBloqueado } from "../telas/cobranca.ts";
-import { telaVitrine, telaStudioNaoEncontrado, telaSuspenso } from "../telas/site.ts";
+import { telaVitrine, telaStudioNaoEncontrado, telaSuspenso, telaPaginaNaoExiste } from "../telas/site.ts";
 import { telaPrivacidade, telaTermos } from "../telas/legal.ts";
+import { robotsTxt, sitemapXml, llmsTxt } from "../telas/descoberta.ts";
 import { br } from "../dados/datas.ts";
 import { timingSafeEqual } from "node:crypto";
 
@@ -39,13 +40,30 @@ function iguais(a: string | null | undefined, b: string | null | undefined): boo
 
 export async function atender(p: Pedido, s: Servicos): Promise<Resposta> {
   const r = await despachar(p, s);
-  return { ...r, cabecalhos: { ...CABECALHOS_SEGUROS, ...r.cabecalhos } };
+  // Subdomínio de studio é o app (login, agenda, clientes): fora de qualquer índice (D021).
+  const app: Record<string, string> = slugDoHost(p.host, s.ambiente.dominioBase) !== null ? { "x-robots-tag": "noindex, nofollow" } : {};
+  return { ...r, cabecalhos: { ...CABECALHOS_SEGUROS, ...app, ...r.cabecalhos } };
+}
+
+const CACHE_DESCOBERTA = { "cache-control": "public, max-age=3600" };
+function textoCom(corpo: string, tipo: string): Resposta {
+  return { status: 200, cabecalhos: { "content-type": tipo, ...CACHE_DESCOBERTA }, corpo };
 }
 
 async function despachar(p: Pedido, s: Servicos): Promise<Resposta> {
   const { ambiente } = s;
   // 1. sem studio
   if (p.caminho === "/saude") return json({ ok: true, hora: s.agora().toISOString() });
+  // Descoberta (D021): www vai para o domínio sem www; robots/sitemap/llms dependem do host.
+  const host = (p.host ?? "").toLowerCase().split(":")[0];
+  if (host === "www." + ambiente.dominioBase) {
+    const q = p.query.toString();
+    return { status: 301, cabecalhos: { location: `https://${ambiente.dominioBase}${p.caminho}${q ? "?" + q : ""}` }, corpo: "" };
+  }
+  const naRaiz = slugDoHost(p.host, ambiente.dominioBase) === null;
+  if (p.caminho === "/robots.txt") return textoCom(robotsTxt(ambiente, naRaiz), "text/plain; charset=utf-8");
+  if (p.caminho === "/sitemap.xml" && naRaiz) return textoCom(sitemapXml(ambiente), "application/xml; charset=utf-8");
+  if (p.caminho === "/llms.txt" && naRaiz) return textoCom(llmsTxt(ambiente), "text/markdown; charset=utf-8");
   if (p.caminho.startsWith("/assets/")) return estatico(p.caminho.slice(8)) ?? texto("não encontrado", 404);
   if (p.caminho === "/privacidade") return html(telaPrivacidade(ambiente));
   if (p.caminho === "/termos") return html(telaTermos(ambiente));
@@ -88,7 +106,7 @@ async function despachar(p: Pedido, s: Servicos): Promise<Resposta> {
 
   // 2. studio pelo Host
   const slug = slugDoHost(p.host, ambiente.dominioBase) ?? (ambiente.modo !== "producao" ? p.query.get("studio") : null) ?? ambiente.studioPadrao;
-  if (!slug) return html(telaVitrine(ambiente));
+  if (!slug) return p.caminho === "/" ? html(telaVitrine(ambiente)) : html(telaPaginaNaoExiste(), 404);
   const resumo = await resolverStudio(slug);
   if (!resumo) return html(telaStudioNaoEncontrado(slug, ambiente), 404);
   if (resumo.situacao === "suspenso" && !p.caminho.startsWith("/webhooks/")) return html(telaSuspenso(resumo.nome), 402);

@@ -110,6 +110,29 @@ A administradora baixa os dados do próprio studio em Configurações → Export
 `/saude` · `/assets/*` · `/rotina/diaria` · `/rotina/exportar` · `/webhooks/asaas-af/<token>`.
 Tudo o mais exige o slug no Host (ou o studio padrão).
 
+## 7a. Busca e IAs: SEO e GEO (D021)
+
+O que fica no ar só na raiz (`clavusos.com.br`):
+
+| Endereço | Para quê |
+|---|---|
+| `/robots.txt` | libera buscadores e robôs de IA (GPTBot, ClaudeBot, PerplexityBot…) e aponta o sitemap |
+| `/sitemap.xml` | as páginas públicas: início, privacidade, termos |
+| `/llms.txt` | o resumo do produto para assistentes de IA (preço, recursos, segurança, links) |
+| `/assets/og.png` | a prévia do link no WhatsApp/Instagram (1200×630) |
+
+- A vitrine traz título, descrição, canônica, Open Graph e JSON-LD (Organização, Site, Software com
+  preço e as Perguntas frequentes — as mesmas da página, de uma fonte só: `app/src/telas/descoberta.ts`).
+- `www.clavusos.com.br` redireciona (301) para `clavusos.com.br`. Endereço que não existe na raiz dá 404.
+- **Subdomínios de studio não entram no Google**: `robots.txt` com `Disallow: /` e o cabeçalho
+  `X-Robots-Tag: noindex` em todas as respostas.
+- **Mudou o texto da vitrine?** Atualize `SITE_ATUALIZADO` em `descoberta.ts` (vai no sitemap) e,
+  se mudar a frase principal, gere de novo as imagens: `node scripts/gerar-og.mjs`.
+- **Google Search Console**: propriedade `clavusos.com.br`, sitemap `https://clavusos.com.br/sitemap.xml`
+  enviado. Relatório de desempenho = cliques e impressões da busca orgânica.
+- **Bing Webmaster Tools** (vale para o ChatGPT, que busca no Bing): importar a propriedade direto do
+  Search Console em bing.com/webmasters.
+
 ## 8. Publicar (o checklist do deploy)
 
 1. **Supabase** (região São Paulo): criar o projeto, pegar a **connection string de sessão**

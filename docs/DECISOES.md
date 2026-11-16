@@ -125,3 +125,15 @@
   no celular virou lista. O saldo do caixa também vai para o cartão cofre. O studio de
   demonstração ganha 5 meses de histórico (antes da janela das vencidas) para os gráficos terem
   tendência na apresentação. Regras visuais em `docs/MARCA.md` ("Cartão cofre e gráficos").
+
+- **D021 · 16/11/2026** — **Descoberta: SEO e GEO na raiz, app fora do índice.** A raiz ganha
+  `robots.txt` (aberto a buscadores e a robôs de IA, com o sitemap), `sitemap.xml` (só páginas
+  públicas), `llms.txt` (resumo do produto para assistentes de IA) e, na vitrine, canônica, Open
+  Graph com imagem própria (`app/publico/og.png`, gerada por `scripts/gerar-og.mjs` a partir do
+  `marca.ts`) e JSON-LD (Organization, WebSite, SoftwareApplication com preço, FAQPage). As
+  perguntas frequentes viram uma fonte só (`descoberta.ts`) para a página e o JSON-LD nunca
+  divergirem; ganharam "Quanto custa?" e "Serve para quem atende sozinha?". `www` → 301 para o
+  domínio sem `www`; qualquer outro caminho na raiz dá 404 (antes repetia a vitrine em toda URL, o
+  que vira conteúdo duplicado). Subdomínios de studio (o app) ficam fora de qualquer índice:
+  `Disallow: /` e `X-Robots-Tag: noindex, nofollow`. O site não tem formulário: os botões abrem o
+  WhatsApp comercial.

@@ -1,6 +1,6 @@
 /**
  * A vitrine do produto na raiz (clavusos.com.br) — a página de venda.
- * Identidade "Amêndoa & Verniz" (app/src/marca.ts): Pó de Arroz como fundo,
+ * Identidade da marca (app/src/marca.ts). SEO/GEO: metas, JSON-LD e perguntas em descoberta.ts (D021): Pó de Arroz como fundo,
  * Fraunces no display, um único momento escuro (a faixa da unha vencida,
  * com a mensagem de WhatsApp que o app realmente escreve). Sem imagem de
  * banco: o que aparece de produto é a própria UI, desenhada em HTML.
@@ -8,6 +8,7 @@
 import { e } from "../http/resposta.ts";
 import type { Ambiente } from "../ambiente.ts";
 import { simbolo, logoHorizontal, PALETA as P, FAVICON_SVG } from "../marca.ts";
+import { perguntas, jsonLd, metasVitrine } from "./descoberta.ts";
 
 const FONTES = `<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,400..600,0..100&family=Instrument+Sans:wght@400;500;600&display=swap">`;
 
@@ -15,10 +16,14 @@ export function telaVitrine(a: Ambiente): string {
   const zap = (msg: string) => `https://wa.me/${a.whatsappComercial}?text=${encodeURIComponent(msg)}`;
   const ctaTeste = zap("Oi! Quero testar o ClavusOS no meu studio 💅");
   const demo = a.demoSlug ? `https://${a.demoSlug}.${a.dominioBase}` : null;
+  const titulo = "ClavusOS — sistema para studio de unhas e nail designer";
+  const descricao = `Agenda por profissional, agendamento online pela cliente, alerta de unha vencida com mensagem pronta, caixa, relatórios e assinaturas com cobrança pelo Asaas. ${a.precoMensal}/mês, ${a.testeDias} dias grátis.`;
 
   return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><title>ClavusOS — o sistema do studio de unhas</title>
-<meta name="description" content="Agenda com mapa por profissional, alerta de unha vencida com mensagem pronta, caixa, assinaturas e cobrança pelo Asaas. ${e(a.precoMensal)}/mês, ${a.testeDias} dias grátis.">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>${e(titulo)}</title>
+<meta name="description" content="${e(descricao)}">
+${metasVitrine(a, titulo, descricao)}
+${jsonLd(a)}
 <link rel="icon" href="data:image/svg+xml;utf8,${encodeURIComponent(FAVICON_SVG)}" type="image/svg+xml">
 ${FONTES}
 <style>
@@ -201,17 +206,8 @@ ${demo && a.demoSenha ? `<section class="faixa" style="padding-top:0;border:0"><
 
 <section class="faixa faq" style="padding-top:0;border:0"><div class="c">
   <h2 style="margin-bottom:14px">Perguntas de quem está chegando</h2>
-  <details><summary>Preciso instalar alguma coisa?</summary>
-    <p>Não. O ClavusOS abre no navegador do celular e do computador, no seu endereço próprio
-    (seustudio.${e(a.dominioBase)}). Dá para adicionar à tela inicial e usar como app.</p></details>
-  <details><summary>Como eu recebo das clientes?</summary>
-    <p>Pelo seu Asaas: Pix com QR na hora, link de pagamento (Pix, cartão ou boleto) e assinatura que renova sozinha.
-    O dinheiro cai na sua conta — o ClavusOS só organiza e dá baixa.</p></details>
-  <details><summary>Minha equipe vê o meu financeiro?</summary>
-    <p>Só se você quiser. Profissional vê a agenda e as clientes; gerente vê também o caixa; o financeiro
-    completo e as configurações são só da dona.</p></details>
-  <details><summary>E se um dia eu quiser sair?</summary>
-    <p>Sem multa e sem drama: você exporta tudo — clientes, agenda e caixa — em um arquivo seu, quando quiser.</p></details>
+  ${perguntas(a).map((q) => `<details><summary>${e(q.p)}</summary>
+    <p>${e(q.r)}</p></details>`).join("\n  ")}
 </div></section>
 
 <footer><div class="c">
@@ -238,4 +234,11 @@ div{max-width:460px;padding:24px;text-align:center}h1{font-family:Fraunces,Georg
 <body><div>${simbolo({ tamanho: 44 })}<h1>${e(nome)}</h1>
 <p style="color:${P.inkSuave}">O acesso a este sistema está temporariamente suspenso. Fale com quem administra o contrato para reativar.
 Seus dados estão guardados e podem ser exportados a qualquer momento.</p></div></body></html>`;
+}
+
+/** 404 da raiz: endereço que não existe no site (antes, qualquer caminho mostrava a vitrine e virava conteúdo duplicado). */
+export function telaPaginaNaoExiste(): string {
+  return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Página não encontrada — ClavusOS</title><meta name="robots" content="noindex">${FONTES}<style>body{font-family:"Instrument Sans",system-ui;background:${P.fundo};color:${P.ink};display:grid;place-items:center;min-height:100vh;margin:0;text-align:center;padding:24px}h1{font-family:Fraunces,Georgia,serif;font-weight:500}a{color:${P.rosaEscuro}}</style></head>
+<body><div>${simbolo({ tamanho: 44 })}<h1>Essa página não existe</h1><p><a href="/">Voltar para o início do ClavusOS</a></p></div></body></html>`;
 }
