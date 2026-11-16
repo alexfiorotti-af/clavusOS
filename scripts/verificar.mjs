@@ -185,6 +185,17 @@ async function verificarBanco() {
     else if (!semColuna.length) PASSOU("Toda tabela isolada tem a coluna studio_id");
     else semColuna.forEach((r) => FALHOU("Tabela isolada sem studio_id", r.relname));
 
+    // 2b. Toda view roda com as permissões de quem consulta (security_invoker); sem isso ela
+    //     roda como o dono e passa por cima do RLS das tabelas de dentro.
+    const views = await dono.query(`
+      SELECT c.relname, COALESCE('security_invoker=true' = ANY(c.reloptions) OR 'security_invoker=on' = ANY(c.reloptions), false) AS invoker
+        FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+       WHERE n.nspname = 'clavus' AND c.relkind = 'v' ORDER BY c.relname`);
+    const viewsFuradas = views.rows.filter((v) => !v.invoker);
+    if (!views.rows.length) {/* nenhuma view */}
+    else if (!viewsFuradas.length) PASSOU(`${views.rows.length} view(s) com security_invoker (respeitam o RLS)`);
+    else viewsFuradas.forEach((v) => FALHOU("View sem security_invoker: roda como o dono e fura o RLS", v.relname));
+
     // 3. Isolamento na prática: como clavus_app no studio A, não enxergar linha do B.
     const studios = await dono.query(`SELECT id FROM clavus.studios ORDER BY criado_em LIMIT 2`);
     if (studios.rows.length >= 1) {
@@ -199,6 +210,14 @@ async function verificarBanco() {
         const vis = await cli.query("SELECT count(*)::int AS n, count(*) FILTER (WHERE studio_id <> $1)::int AS fora FROM clientes", [a]);
         if (vis.rows[0].fora === 0) PASSOU("clavus_app no studio A não lê cliente de outro studio", `${vis.rows[0].n} linhas, 0 de fora`);
         else FALHOU("VAZAMENTO: clavus_app enxergou cliente de outro studio", `${vis.rows[0].fora} linhas fora do contexto`);
+        // Também pelas views (o caminho que costuma escapar).
+        for (const v of views.rows) {
+          const temStudio = (await cli.query("SELECT 1 FROM information_schema.columns WHERE table_schema='clavus' AND table_name=$1 AND column_name='studio_id'", [v.relname])).rowCount;
+          if (!temStudio) continue;
+          const fv = await cli.query(`SELECT count(*)::int AS fora FROM ${v.relname.replace(/[^a-z_]/g, "")} WHERE studio_id <> $1`, [a]);
+          if (fv.rows[0].fora === 0) PASSOU(`View ${v.relname}: nada de outro studio`);
+          else FALHOU(`VAZAMENTO pela view ${v.relname}`, `${fv.rows[0].fora} linhas de outro studio`);
+        }
         // Sem contexto nenhum: não pode ver nada.
         await cli.query("SELECT set_config('clavus.studio_id','',true)");
         const zero = await cli.query("SELECT count(*)::int AS n FROM clientes");

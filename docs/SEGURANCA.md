@@ -11,7 +11,7 @@ Sem banco, ele roda só as checagens de código e repositório. Com `CLAVUS_DATA
 apontando para uma **cópia de teste** (nunca a produção na primeira vez), ele também prova o
 isolamento entre studios e a integridade dos dados ao vivo. Sai com código de erro se algo falhar.
 
-Última auditoria completa: **30/10/2026** — 27 checagens, 0 falhas.
+Última auditoria completa: **16/11/2026** — 29 checagens, 0 falhas (inclui as views, D019).
 
 ## O que o verificador cobre
 
@@ -40,6 +40,8 @@ isolamento entre studios e a integridade dos dados ao vivo. Sai com código de e
 ### Banco (RLS e integridade)
 - RLS **ligado e forçado** (FORCE) nas 18 tabelas de dado; `studios`/`migracoes` fora de propósito.
 - Toda tabela isolada tem a coluna `studio_id`.
+- Toda **view** tem `security_invoker` (sem isso ela roda como o dono e passa por cima do RLS) e,
+  ao vivo, não devolve nada de outro studio (D019).
 - **Prova ao vivo**: `clavus_app` no contexto do studio A não lê nenhuma linha do studio B.
 - **Prova ao vivo**: sem studio no contexto, `clavus_app` não lê nada.
 - Integridade: sem dinheiro negativo, sem estoque negativo, sem agendamento/sessão órfãos,
@@ -52,6 +54,7 @@ Estes são os vetores que um atacante — pessoa ou outra IA — tentaria, e o q
 | Tentativa | O que impede |
 |---|---|
 | Ler/gravar dados de outro studio | **RLS FORCE** em toda tabela; a app roda como `clavus_app`, presa ao `studio_id` do contexto. Provado ao vivo pelo verificador e pelos testes `banco.teste.ts`. |
+| Ler outro studio por uma *view* | Views com `security_invoker`: o RLS das tabelas vale por dentro delas. Achado e corrigido em 16/11 (D019); o verificador e um teste de banco reprovam view nova sem isso. |
 | Injeção de SQL por campo ou URL | Todas as consultas são parametrizadas; a única coluna dinâmica usa allowlist; o fuso é validado por regex. |
 | Forjar pagamento por webhook | O webhook **nunca baixa conta**: ele confere a cobrança na API do Asaas. Além disso exige token na URL. |
 | Chamar a rotina/renovar-demo/exportar sem permissão | Exigem `CLAVUS_CHAVE_ROTINA` com comparação em tempo constante; sem ela, 401. |

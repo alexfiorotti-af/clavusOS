@@ -219,3 +219,21 @@ test("webhook da AF: confere a assinatura na API e empurra pago_ate do studio", 
   assert.equal(studio.situacao, "ativo");
   delete process.env.CLAVUS_ASAAS_AF_CHAVE;
 });
+
+test("views respeitam o RLS: clientes_ciclo do B não mostra o histórico do A (security_invoker)", async () => {
+  // O teste do fluxo deixou atendimento concluído no A: a view tem linha do A.
+  await porStudio(A)(async (db) => {
+    assert.ok((await db.query("SELECT count(*)::int AS n FROM clientes_ciclo")).rows[0].n > 0, "o A vê o próprio ciclo");
+  });
+  await porStudio(B)(async (db) => {
+    assert.equal((await db.query("SELECT count(*)::int AS n FROM clientes_ciclo")).rows[0].n, 0, "o B não vê o ciclo das clientes do A");
+  });
+  // e toda view do schema nasce com security_invoker (senão roda como o dono e fura o RLS)
+  await semStudio(async (db) => {
+    const r = await db.query<{ relname: string }>(
+      `SELECT c.relname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+        WHERE n.nspname = 'clavus' AND c.relkind = 'v'
+          AND NOT COALESCE('security_invoker=true' = ANY(c.reloptions) OR 'security_invoker=on' = ANY(c.reloptions), false)`);
+    assert.deepEqual(r.rows.map((x) => x.relname), [], "view sem security_invoker");
+  });
+});
