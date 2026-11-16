@@ -109,3 +109,19 @@
   de 30/10 olhou tabelas e não views. Migração `004_views_security_invoker.sql`; teste de banco
   que reprova view sem `security_invoker` ou que mostre outro studio; o `npm run verificar` checa
   as duas coisas. Regra: toda view nova nasce com `WITH (security_invoker = true)`.
+
+- **D020 · 16/11/2026** — **Relatórios para decidir + cartão cofre.** Os relatórios saem da lista
+  de barras e passam a responder "o que eu faço este mês": (1) o resultado num cartão ameixa
+  (cofre) e quatro números da agenda (atendimentos, ticket médio, clientes, faltas), comparados
+  com o mês anterior — no mês corrente, a receita é comparada com o mês anterior **no mesmo dia**,
+  nunca com o mês inteiro; (2) "Para decidir este mês": até 5 frases com o botão que resolve
+  (unha vencida com o valor em jogo, horário mais vazio, despesa acima da receita, pouco
+  agendamento pela cliente, faltas, receita garantida por assinatura); (3) gráficos novos:
+  colunas dos últimos 6 meses (entrou × saiu), ritmo do mês (receita acumulada contra o mês
+  anterior), mapa de calor dia da semana × período, equipe em barra dividida (fica no studio ×
+  comissão), rankings e o medidor de agendamento online. Gráficos em HTML/CSS no servidor
+  (`telas/graficos.ts`), sem biblioteca nem script; cores validadas com o validador da skill
+  dataviz nas 4 cores de studio (CVD ≥ 9,4; contraste ≥ 3:1). A tabela de produção que cortava
+  no celular virou lista. O saldo do caixa também vai para o cartão cofre. O studio de
+  demonstração ganha 5 meses de histórico (antes da janela das vencidas) para os gráficos terem
+  tendência na apresentação. Regras visuais em `docs/MARCA.md` ("Cartão cofre e gráficos").
