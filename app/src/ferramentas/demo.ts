@@ -10,7 +10,7 @@
  */
 import { comStudio, semStudio } from "../db/contexto.ts";
 import { gerarHash } from "../auth/senha.ts";
-import { hojeEm, somarDias } from "../dados/datas.ts";
+import { hojeEm, somarDias, somarMeses, diaDaSemana, type DiaISO } from "../dados/datas.ts";
 import { criarAgendamento, concluir, cancelar } from "../agenda/agenda.ts";
 import { venderProdutos, lancar } from "../caixa/caixa.ts";
 import { venderAssinatura, registrarRecebimento, gerarHorariosDoMes } from "../planos/planos.ts";
@@ -86,6 +86,33 @@ export async function recriarDemo(o: OpcoesDemo): Promise<ResultadoDemo> {
       const a = await marca(c, s, somarDias(hoje, -atras), inicio, p);
       await concluir(db, id, a.id, { forma: formas[f++ % formas.length], usuarioId: null });
     };
+
+    // Histórico antigo (D020): 5 meses de atendimentos e despesas para os relatórios terem
+    // tendência na apresentação. Só antes de 41 dias atrás, para não mexer na história das
+    // vencidas abaixo; só clientes que já têm atendimento recente (a última unha delas não muda).
+    // Um choque eventual de horário é pulado (SAVEPOINT), sem quebrar a recriação.
+    {
+      const limite = somarDias(hoje, -41);
+      const quem = [0, 1, 2, 3, 6, 7, 8, 9], horas = ["09:00", "10:30", "13:00", "14:30", "16:00"];
+      const porMes = [9, 11, 12, 14, 16];   // do mais antigo ao mais recente: o studio crescendo
+      for (let k = 5; k >= 1; k--) {
+        const ym = somarMeses((hoje.slice(0, 8) + "01") as DiaISO, -k).slice(0, 7);
+        for (let i = 0; i < porMes[5 - k]; i++) {
+          let dia = `${ym}-${String(2 + ((i * 7 + k * 3) % 25)).padStart(2, "0")}` as DiaISO;
+          if (diaDaSemana(dia) === 0) dia = somarDias(dia, 1);
+          if (dia >= limite) continue;
+          await db.query("SAVEPOINT hist");
+          try {
+            const a = await marca(quem[(i + k) % quem.length], (i * 5 + k) % 6, dia, horas[(i + k) % horas.length], (i + k) % 2);
+            await concluir(db, id, a.id, { forma: formas[f++ % formas.length], usuarioId: null });
+            await db.query("RELEASE SAVEPOINT hist");
+          } catch { await db.query("ROLLBACK TO SAVEPOINT hist"); }
+        }
+        for (const [categoria, descricao, valor, d] of [["Aluguel", "Aluguel do studio", 60000, "05"], ["Material", "Géis, lixas e algodão", 14000 + k * 1500, "12"], ["Contas", "Energia do mês", 10500 + k * 500, "20"]] as const) {
+          if (`${ym}-${d}` < hoje) await lancar(db, id, { tipo: "despesa", categoria, descricao, valor, forma: "pix", data: `${ym}-${d}` as DiaISO, usuarioId: null });
+        }
+      }
+    }
 
     // Histórico concluído — alimenta vencidas, caixa e relatórios do mês.
     await atendido(0, 0, 30, "10:00", 0);  // Juliana · gel há 30d (ciclo 21) → vencida há 9

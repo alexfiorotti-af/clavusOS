@@ -71,6 +71,18 @@ Proporção numa peça: ~56% porcelana/nude, 14% papel, 20% ameixa, 8% cereja, 2
 - **Linha do dia**: atendimentos como pílulas no tom de cada profissional; linha cereja no agora.
 - **Padrão de amêndoas**: tom sobre tom, para impressos e embalagem; nunca com texto em cima.
 
+## Cartão cofre e gráficos (D020)
+
+- **Cartão cofre**: o dinheiro do período (saldo do caixa, resultado do mês) mora num cartão
+  **ameixa**, com o valor em Fraunces no **verniz claro `#E3C27A`**; negativo em rosa claro
+  `#F4A6B6`, entradas em verde claro `#9FDDBB`. É o único cartão escuro do app.
+- **Gráficos** (`app/src/telas/graficos.ts`): o que importa na **cor do studio**, o contexto
+  (despesa, mês anterior, comissão) em **cinza-ameixa `#9C8A95`**. Barras finas com ponta
+  arredondada, linha de 2 px, grade em fio. Nada de pizza ou rosca.
+- **Mapa de calor**: cinco tons da cor do studio (14/28/46/66/100%); número em ameixa até 66% e
+  em branco no tom cheio (contraste medido ≥ 4,5:1 nas quatro cores testadas).
+- Todo gráfico tem uma **frase que diz o que ele mostra** e "Ver os números" com a tabela.
+
 ## Voz
 
 | Onde | Assim não | Assim sim |

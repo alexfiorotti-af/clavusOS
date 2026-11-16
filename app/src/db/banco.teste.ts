@@ -19,6 +19,7 @@ import { venderAssinatura, registrarRecebimento, gerarHorariosDoMes } from "../p
 import { receberWebhookAF } from "../assinatura/assinatura.ts";
 import { cifrar, novaChaveMestra } from "../dados/cofre.ts";
 import { hojeEm, somarDias } from "../dados/datas.ts";
+import * as Rel from "../caixa/relatorios.ts";
 import { lerAmbiente } from "../ambiente.ts";
 import type { Studio } from "../studio/studio.ts";
 
@@ -235,5 +236,27 @@ test("views respeitam o RLS: clientes_ciclo do B não mostra o histórico do A (
         WHERE n.nspname = 'clavus' AND c.relkind = 'v'
           AND NOT COALESCE('security_invoker=true' = ANY(c.reloptions) OR 'security_invoker=on' = ANY(c.reloptions), false)`);
     assert.deepEqual(r.rows.map((x) => x.relname), [], "view sem security_invoker");
+  });
+});
+
+test("relatórios: mês vazio, fevereiro e mês de 30 dias devolvem zeros, sem erro", async () => {
+  await porStudio(B)(async (db) => {   // o B não tem movimento nenhum
+    for (const [ym, dias] of [["2027-02", 28], ["2026-11", 30], ["2028-02", 29]] as const) {
+      const serie = await Rel.serieMensal(db, ym, 6);
+      assert.equal(serie.length, 6); assert.equal(serie[5].ym, ym);
+      assert.ok(serie.every((m) => m.receitas === 0 && m.despesas === 0));
+      const acum = await Rel.receitaAcumulada(db, ym, dias);
+      assert.equal(acum.length, dias);
+      assert.equal((await Rel.indicadores(db, ym)).atendimentos, 0);
+      assert.deepEqual((await Rel.ocupacao(db, ym)).flat().reduce((s, n) => s + n, 0), 0);
+    }
+    assert.deepEqual(await Rel.dinheiroParado(db, hoje), { clientes: 0, valor: 0 });
+    assert.deepEqual(await Rel.recorrente(db), { assinaturas: 0, porMes: 0 });
+  });
+  await porStudio(A)(async (db) => {   // o A tem atendimento concluído (fluxo acima): a série soma a receita
+    const ym = hoje.slice(0, 7);
+    const serie = await Rel.serieMensal(db, ym, 6);
+    const ind = await Rel.indicadores(db, ym);
+    if (ind.atendimentos > 0) assert.ok(serie[5].receitas > 0, "receita do mês aparece na série");
   });
 });

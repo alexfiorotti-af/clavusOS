@@ -17,6 +17,7 @@ import { confirmacaoDeHorario, sinalPendente } from "../correio/mensagens.ts";
 import * as TA from "../telas/agenda.ts";
 import * as TC from "../telas/clientes.ts";
 import * as TX from "../telas/caixa.ts";
+import * as TR from "../telas/relatorios.ts";
 
 async function listas(w: Web): Promise<{ servicos: TA.Srv[]; profs: TA.Prof[] }> {
   return w.db(async (db) => ({
@@ -281,15 +282,31 @@ export async function rotasApp(w: Web): Promise<Resposta | null> {
     const ym = /^\d{4}-\d{2}$/.test(p.query.get("mes") ?? "") ? p.query.get("mes")! : w.hoje.slice(0, 7);
     const primeiro = ym + "-01" as DiaISO;
     const ultimo = somarDias(somarMeses(primeiro, 1), -1); // último dia real do mês (nunca 31 fixo)
+    const primeiroAnt = somarMeses(primeiro, -1), ultimoAnt = somarDias(primeiro, -1), ymAnt = primeiroAnt.slice(0, 7);
+    const dias = Number(ultimo.slice(8, 10)), diasAnt = Number(ultimoAnt.slice(8, 10));
+    const s = w.studio;
     const dados = await w.db(async (db) => ({
       resumo: await Cx.resumoDoPeriodo(db, primeiro, ultimo),
+      resumoAnt: await Cx.resumoDoPeriodo(db, primeiroAnt, ultimoAnt),
+      ind: await Rel.indicadores(db, ym),
+      indAnt: await Rel.indicadores(db, ymAnt),
+      serie: await Rel.serieMensal(db, ym, 6),
+      ritmoAtual: await Rel.receitaAcumulada(db, ym, dias),
+      ritmoAnt: await Rel.receitaAcumulada(db, ymAnt, diasAnt),
+      ocupacao: await Rel.ocupacao(db, ym),
       recCat: await Rel.porCategoria(db, ym, "receita"),
       despCat: await Rel.porCategoria(db, ym, "despesa"),
       producao: await Rel.producaoPorProfissional(db, ym),
       topSrv: await Rel.topServicos(db, ym),
       origens: await Rel.clientesPorOrigem(db, ym),
+      parado: await Rel.dinheiroParado(db, w.hoje),
+      recorrente: await Rel.recorrente(db),
     }));
-    return w.tela("Relatórios", TX.telaRelatorios({ ym, ...dados }), { ativo: "/relatorios" });
+    return w.tela("Relatórios", TR.telaRelatorios({
+      ym, hoje: w.hoje, dias, ...dados,
+      diasAbertos: [...s.dias_atendimento].sort((a, b) => ((a + 6) % 7) - ((b + 6) % 7)), // segunda primeiro, domingo no fim
+      abre: String(s.abre), fecha: String(s.fecha), agendarOnline: s.agendar_online,
+    }), { ativo: "/relatorios" });
   }
 
   return null;
